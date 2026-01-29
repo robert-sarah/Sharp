@@ -50,6 +50,106 @@ from interpreter import Interpreter
 from stdlib import SharpNil, STDLIB
 
 
+class IntelligentAutoCompleter:
+    """Context-aware autocompletion engine that understands Sharp language syntax."""
+    
+    # Define what keywords/tokens can follow each keyword
+    KEYWORD_CONTEXT = {
+        'if': ['(', 'not', 'true', 'false', 'nil'],
+        'elif': ['(', 'not', 'true', 'false', 'nil'],
+        'else': [':', 'if'],
+        'while': ['(', 'not', 'true', 'false'],
+        'for': ['(', 'in'],
+        'in': [],
+        'def': ['('],
+        'let': ['=', ':', ','],
+        'return': ['(', 'nil', 'true', 'false'],
+        'lambda': [':', ','],
+        'import': [],
+        'from': ['import'],
+        'match': ['{', 'case'],
+        'case': [':', '=>'],
+        'type': ['{', ':'],
+        '[': [']', ','],
+        '{': ['}', ':', ','],
+        '(': [')', ','],
+    }
+    
+    # Common operators and their typical successors
+    OPERATOR_CONTEXT = {
+        '+': ['identifier', 'number', 'string', '(', '[', '{'],
+        '-': ['identifier', 'number', '(', '['],
+        '*': ['identifier', 'number', '(', '['],
+        '/': ['identifier', 'number', '(', '['],
+        '=': ['identifier', 'number', 'string', 'true', 'false', 'nil', '(', '[', '{'],
+        '==': ['identifier', 'number', 'string', 'true', 'false', 'nil'],
+        '!=': ['identifier', 'number', 'string', 'true', 'false', 'nil'],
+        '>': ['identifier', 'number', '='],
+        '<': ['identifier', 'number', '='],
+        'and': ['identifier', 'not', 'true', 'false'],
+        'or': ['identifier', 'not', 'true', 'false'],
+        'not': ['identifier', '('],
+    }
+    
+    KEYWORDS = [
+        'def', 'let', 'if', 'elif', 'else', 'while', 'for', 'in', 'return',
+        'break', 'continue', 'match', 'case', 'type', 'import', 'from', 'as',
+        'lambda', 'true', 'false', 'nil', 'and', 'or', 'not'
+    ]
+    
+    def __init__(self):
+        self.last_tokens = []
+    
+    def update_context(self, code, cursor_pos):
+        """Update the context based on current code."""
+        # Get last line
+        lines = code[:cursor_pos].split('\n')
+        if lines:
+            last_line = lines[-1].strip()
+            self.last_tokens = last_line.split()
+    
+    def get_suggestions(self, word_prefix, code, cursor_pos):
+        """Get intelligent suggestions based on context."""
+        self.update_context(code, cursor_pos)
+        
+        suggestions = []
+        
+        # Get last meaningful token
+        last_token = self.last_tokens[-1] if self.last_tokens else None
+        
+        # If previous token is a keyword, suggest context-appropriate completions
+        if last_token in self.KEYWORD_CONTEXT:
+            context_tokens = self.KEYWORD_CONTEXT[last_token]
+            suggestions.extend([t for t in context_tokens if t.startswith(word_prefix)])
+        
+        # If previous token is an operator, suggest appropriate tokens
+        if last_token in self.OPERATOR_CONTEXT:
+            context_tokens = self.OPERATOR_CONTEXT[last_token]
+            suggestions.extend([t for t in context_tokens if t.startswith(word_prefix)])
+        
+        # Always add matching keywords
+        suggestions.extend([k for k in self.KEYWORDS if k.startswith(word_prefix)])
+        
+        # Add modules
+        module_dir = os.path.join(os.path.dirname(__file__), 'modules')
+        if os.path.exists(module_dir):
+            try:
+                module_files = os.listdir(module_dir)
+                modules = sorted(set([f.split('.')[0] for f in module_files 
+                                     if f.endswith('.sharp') or f.endswith('.py')]))
+                suggestions.extend([m for m in modules if m.startswith(word_prefix)])
+            except:
+                pass
+        
+        # Add builtins
+        suggestions.extend([b for b in STDLIB.keys() if b.startswith(word_prefix)])
+        
+        # Remove duplicates and sort
+        suggestions = sorted(set(suggestions))
+        
+        return suggestions[:20]  # Limit to 20 suggestions
+
+
 class LineNumberArea(QFrame):
     """Line number display on the left side of the editor."""
     
@@ -218,6 +318,9 @@ class SharpEditorWidget(QPlainTextEdit):
         # Syntax highlighter
         self.highlighter = SyntaxHighlighter(self.document())
         
+        # Intelligent autocompletion engine
+        self.auto_completer = IntelligentAutoCompleter()
+        
         # Line numbers
         self.line_number_area = LineNumberArea(self)
         
@@ -273,37 +376,20 @@ class SharpEditorWidget(QPlainTextEdit):
         return word
     
     def _show_autocomplete(self):
-        """Show autocomplete suggestions."""
+        """Show autocomplete suggestions using intelligent context."""
         word = self._get_current_word()
         
         if not word or len(word) < 1:
             self.autocomplete.hide()
             return
         
-        # Get all completions
-        keywords = [
-            'def', 'let', 'if', 'elif', 'else', 'while', 'for', 'in', 'return',
-            'break', 'continue', 'match', 'case', 'type', 'import', 'from', 'as',
-            'lambda', 'true', 'false', 'nil'
-        ]
+        # Get cursor position for context
+        code = self.toPlainText()
+        cursor = self.textCursor()
+        cursor_pos = cursor.position()
         
-        module_dir = os.path.join(os.path.dirname(__file__), 'modules')
-        if os.path.exists(module_dir):
-            module_files = os.listdir(module_dir)
-            modules = sorted(set([f.split('.')[0] for f in module_files 
-                                 if f.endswith('.sharp') or f.endswith('.py')]))
-        else:
-            modules = []
-        
-        builtins = list(STDLIB.keys())
-        
-        # Get matching completions
-        completions = []
-        completions += [k for k in keywords if k.startswith(word)]
-        completions += [m for m in modules if m.startswith(word)]
-        completions += [b for b in builtins if b.startswith(word)]
-        
-        completions = sorted(set(completions))
+        # Use intelligent autocompletion engine
+        completions = self.auto_completer.get_suggestions(word, code, cursor_pos)
         
         if not completions:
             self.autocomplete.hide()
@@ -719,6 +805,12 @@ class SharpIDE(QMainWindow):
         
         self.setWindowTitle("Sharp IDE - Professional Edition")
         self.setGeometry(50, 50, 1800, 1000)
+        
+        # Set window icon from logo
+        logo_path = os.path.join(os.path.dirname(__file__), 'sharp_logo.svg')
+        if os.path.exists(logo_path):
+            icon = QIcon(logo_path)
+            self.setWindowIcon(icon)
         
         # Apply dark theme
         self.setStyleSheet("""
