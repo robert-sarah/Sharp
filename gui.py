@@ -225,6 +225,8 @@ class SharpIDE:
             if event:
                 # Trigger on any character
                 self.show_autocomplete_if_matches()
+            # Ensure editor has focus after key press
+            self.editor.focus_set()
         except Exception:
             pass  # Silently ignore errors
     
@@ -328,16 +330,16 @@ class SharpIDE:
             # Select first item
             self.autocomplete_listbox.selection_set(0)
 
-            # Bind keys
+            # Bind keys - don't give focus to listbox
             self.autocomplete_listbox.bind("<Return>", self.apply_autocomplete)
             self.autocomplete_listbox.bind("<Tab>", self.close_autocomplete_no_insert)
             self.autocomplete_listbox.bind("<space>", self.close_autocomplete_no_insert)
             self.autocomplete_listbox.bind("<Escape>", lambda e: self.hide_autocomplete())
             self.autocomplete_listbox.bind("<Up>", self.autocomplete_up)
             self.autocomplete_listbox.bind("<Down>", self.autocomplete_down)
-            self.autocomplete_listbox.bind("<Key>", self.autocomplete_keypress)
 
-            self.autocomplete_listbox.focus()
+            # Don't steal focus - editor keeps it so user can type normally
+            self.editor.focus_set()
         except Exception:
             self.hide_autocomplete()
 
