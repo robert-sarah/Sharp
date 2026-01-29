@@ -4,7 +4,11 @@ Alternative to PyQt5 for building desktop applications
 """
 
 try:
-    import wx
+    try:
+        import wx
+    except ImportError:
+        print("wxPython is not installed. Please install it with: pip install wxPython")
+        raise
     WXPYTHON_AVAILABLE = True
 except ImportError:
     WXPYTHON_AVAILABLE = False

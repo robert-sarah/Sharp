@@ -217,17 +217,14 @@ class SharpIDE:
             pass  # Silently ignore syntax highlighting errors
     
     def on_key_release(self, event=None):
-        """Handle key release events for syntax highlighting and line numbers."""
+        """Handle key release events for syntax highlighting, line numbers, and autocomplete."""
         try:
             self.update_line_numbers()
             self.highlight_syntax()
-            
-            # Show autocomplete on typing (Ctrl+Space or after 3 chars)
-            if event and hasattr(event, 'char') and event.char and event.char.isalnum():
-                # Auto-trigger autocomplete after typing 3 chars
-                word = self.get_current_word()
-                if len(word) >= 3:
-                    self.show_autocomplete_if_matches()
+            # Always trigger autocomplete for any word or after space for import/from
+            if event:
+                # Trigger on any character
+                self.show_autocomplete_if_matches()
         except Exception:
             pass  # Silently ignore errors
     
@@ -253,27 +250,65 @@ class SharpIDE:
             return ""
     
     def show_autocomplete(self, event=None):
-        """Show autocomplete suggestions."""
+        """Show autocomplete suggestions for keywords, modules, and functions."""
         try:
             word = self.get_current_word()
             if not word:
                 self.hide_autocomplete()
                 return
-            
-            # Get matching completions
-            matches = [item for item in STDLIB.keys() if item.startswith(word)]
-            
-            if not matches:
+
+            # Sharp keywords
+            keywords = [
+                'def', 'let', 'if', 'elif', 'else', 'while', 'for', 'in', 'return', 'break', 'continue',
+                'match', 'case', 'type', 'import', 'from', 'as', 'lambda', 'true', 'false', 'nil'
+            ]
+            # Module names
+            module_files = os.listdir(os.path.join(os.path.dirname(__file__), 'modules'))
+            modules = [f.split('.')[0] for f in module_files if f.endswith('.sharp') or f.endswith('.py')]
+            modules = list(sorted(set(modules)))
+            # Builtin functions
+            builtins = list(STDLIB.keys())
+
+            # Context-aware completions
+            line = self.editor.get("insert linestart", "insert lineend")
+            completions = []
+            if re.match(r'\s*import\s+\w*$', line):
+                completions = [m for m in modules if m.startswith(word)]
+            elif re.match(r'\s*from\s+\w+\s+import\s+\w*$', line):
+                # Try to get module exports
+                modname = line.split()[1]
+                mod_exports = []
+                try:
+                    modfile = os.path.join(os.path.dirname(__file__), 'modules', modname + '.sharp')
+                    if os.path.exists(modfile):
+                        with open(modfile, 'r', encoding='utf-8') as f:
+                            mod_exports = re.findall(r'def\s+(\w+)', f.read())
+                    else:
+                        modfile = os.path.join(os.path.dirname(__file__), 'modules', modname + '.py')
+                        if os.path.exists(modfile):
+                            with open(modfile, 'r', encoding='utf-8') as f:
+                                mod_exports = re.findall(r'def\s+(\w+)', f.read())
+                except Exception:
+                    pass
+                completions = [e for e in mod_exports if e.startswith(word)]
+            else:
+                # Default: keywords, builtins, modules
+                completions = [k for k in keywords if k.startswith(word)]
+                completions += [m for m in modules if m.startswith(word)]
+                completions += [b for b in builtins if b.startswith(word)]
+
+            completions = sorted(set(completions))
+            if not completions:
                 self.hide_autocomplete()
                 return
-            
+
             # Create autocomplete window
             if self.autocomplete_window:
                 self.autocomplete_window.destroy()
-            
+
             self.autocomplete_window = tk.Toplevel(self.editor)
             self.autocomplete_window.wm_overrideredirect(True)
-            
+
             # Position window at cursor
             cursor = self.editor.index(tk.INSERT)
             bbox = self.editor.bbox(cursor)
@@ -281,33 +316,58 @@ class SharpIDE:
                 x = bbox[0] + self.editor.winfo_rootx()
                 y = bbox[1] + bbox[3] + self.editor.winfo_rooty()
                 self.autocomplete_window.wm_geometry(f"+{x}+{y}")
-            
+
             # Create listbox
             self.autocomplete_listbox = tk.Listbox(self.autocomplete_window, bg="#2b2b2b", fg="#d4d4d4", 
-                                                   font=("Courier", 10), height=min(10, len(matches)))
+                                                   font=("Courier", 10), height=min(10, len(completions)))
             self.autocomplete_listbox.pack(fill=tk.BOTH, expand=True)
-            
-            for match in matches:
+
+            for match in completions:
                 self.autocomplete_listbox.insert(tk.END, match)
-            
+
             # Select first item
             self.autocomplete_listbox.selection_set(0)
-            
+
             # Bind keys
             self.autocomplete_listbox.bind("<Return>", self.apply_autocomplete)
+            self.autocomplete_listbox.bind("<Tab>", self.close_autocomplete_no_insert)
+            self.autocomplete_listbox.bind("<space>", self.close_autocomplete_no_insert)
             self.autocomplete_listbox.bind("<Escape>", lambda e: self.hide_autocomplete())
             self.autocomplete_listbox.bind("<Up>", self.autocomplete_up)
             self.autocomplete_listbox.bind("<Down>", self.autocomplete_down)
-            
+            self.autocomplete_listbox.bind("<Key>", self.autocomplete_keypress)
+
             self.autocomplete_listbox.focus()
         except Exception:
             self.hide_autocomplete()
+
+    def close_autocomplete_no_insert(self, event=None):
+        """Ferme l'autocomplétion sans rien insérer (pour espace/tab)."""
+        self.hide_autocomplete()
+        # Redonne le focus à l'éditeur et insère la touche
+        self.editor.focus_set()
+        if event and event.keysym == 'Tab':
+            self.editor.insert(tk.INSERT, '\t')
+        elif event and event.keysym == 'space':
+            self.editor.insert(tk.INSERT, ' ')
+        return "break"
+
+    def autocomplete_keypress(self, event):
+        """Ferme l'autocomplétion sur toute autre touche normale (lettre, chiffre, etc.)."""
+        # Autorise navigation/flèches, Entrée, Tab, Espace, sinon ferme
+        if event.keysym in ("Up", "Down", "Return", "Tab", "space", "Escape"):
+            return
+        self.hide_autocomplete()
+        self.editor.focus_set()
+        # Laisse la touche passer à l'éditeur
+        return None
     
     def show_autocomplete_if_matches(self):
-        """Show autocomplete if there are matches."""
+        """Show autocomplete if there are matches for keywords, modules, or functions."""
         word = self.get_current_word()
-        matches = [item for item in STDLIB.keys() if item.startswith(word)]
-        if matches and len(word) >= 3:
+        # Always show autocomplete if word is not empty or if line matches import/from
+        line = self.editor.get("insert linestart", "insert lineend")
+        if word or re.match(r'\s*(import|from)\s*$', line):
             self.show_autocomplete()
     
     def apply_autocomplete(self, event=None):
@@ -439,48 +499,40 @@ class SharpIDE:
     def run_code(self):
         """Execute the Sharp program."""
         source = self.editor.get("1.0", tk.END)
-        
         if not source.strip():
             messagebox.showwarning("Warning", "No code to execute")
             return
-        
         self.clear_output()
         self.update_status("Running...")
-        
-        # Capture stdout
         old_stdout = sys.stdout
         sys.stdout = StringIO()
-        
         try:
+            # Special check for PyQt5 if using GUI
+            if 'import pyqt5_wrapper' in source or 'from pyqt5_wrapper' in source or 'import gui' in source:
+                try:
+                    import PyQt5
+                except ImportError:
+                    self.append_output("PyQt5 is not installed. Please install it with: pip install PyQt5\n")
+                    self.update_status("PyQt5 missing")
+                    return
             # Lex
             lexer = Lexer(source)
             tokens = lexer.tokenize()
-            
-            # Check for errors
             for token in tokens:
                 if token.type.name == 'ERROR':
                     self.append_output(f"Lexer Error: {token.value}\n")
                     self.update_status("Error - lexing failed")
                     return
-            
-            # Parse
             parser = Parser(tokens)
             ast = parser.parse()
-            
-            # Interpret
             self.interpreter = Interpreter()  # Fresh interpreter for each run
             result = self.interpreter.interpret(ast)
-            
-            # Get captured output
             output = sys.stdout.getvalue()
-            
             if output:
                 self.append_output(output)
-            
             self.update_status("Execution completed successfully")
             if result and not isinstance(result, SharpNil):
                 self.append_output(f"Result: {result}\n")
-        
         except SyntaxError as e:
             self.append_output(f"SyntaxError: {e}\n")
             self.update_status("Error - syntax error")
@@ -488,7 +540,6 @@ class SharpIDE:
             self.append_output(f"{type(e).__name__}: {e}\n")
             self.update_status(f"Error - {type(e).__name__}")
         finally:
-            # Restore stdout
             sys.stdout = old_stdout
     
     def clear_output(self):

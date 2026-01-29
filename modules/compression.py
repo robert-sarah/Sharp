@@ -1,3 +1,4 @@
+import base64
 """Compression utilities for Sharp"""
 import zipfile
 import gzip
