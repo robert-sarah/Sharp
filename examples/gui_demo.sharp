@@ -1,0 +1,43 @@
+# GUI Application Example - Simple Form
+# Demonstrates Sharp GUI with PyQt5
+
+import pyqt5_wrapper as gui
+
+# Create a window
+window = gui.create_window("Sharp GUI Demo", 500, 400)
+
+# Add title label
+window.add_label("title", "Welcome to Sharp GUI!")
+
+# Add text label
+window.add_label("subtitle", "This is a GUI application written in Sharp")
+
+# Add input field
+window.add_textbox("name_input", "Enter your name...")
+
+# Add another field
+window.add_textbox("email_input", "Enter your email...")
+
+# Add text area
+window.add_textarea("message_area", "Type a message here...")
+
+# Add greeting button
+def on_greet():
+    name = window.get_text("name_input")
+    message = "Hello, " + name + "! Welcome to Sharp GUI."
+    window.set_text("message_area", message)
+
+window.add_button("greet_btn", "Greet Me!", on_greet)
+
+# Add clear button
+def on_clear():
+    window.set_text("name_input", "")
+    window.set_text("email_input", "")
+    window.set_text("message_area", "")
+
+window.add_button("clear_btn", "Clear All", on_clear)
+
+# Show the window
+window.show()
+
+print("GUI demo started!")

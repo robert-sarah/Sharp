@@ -1,0 +1,11 @@
+# Calculate factorial
+
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+print("Factorials:")
+for i in range(1, 11):
+    let f = factorial(i)
+    print(str(i) + "! = " + str(f))

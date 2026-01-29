@@ -1,0 +1,62 @@
+# Sharp GUI Timer Application
+# A simple timer application with GUI
+
+def create_timer_app():
+    # Create main window
+    let window = gui_window("Sharp Timer", 400, 300)
+    
+    # Create title label
+    let title = gui_label(window, "⏱ Sharp Timer Application")
+    
+    # Create time display
+    let time_display = gui_textarea(window, 2, 30)
+    widget_set_text(time_display, "00:00:00.000")
+    
+    # Create description
+    let desc = gui_label(window, "A simple timer built with Sharp")
+    
+    # Create timer object
+    let my_timer = timer()
+    
+    # Button handlers
+    def start_timer():
+        timer_start(my_timer)
+        print("Timer started!")
+    
+    def stop_timer():
+        let elapsed = timer_stop(my_timer)
+        let seconds = floor(elapsed)
+        let milliseconds = floor((elapsed - seconds) * 1000)
+        let message = "Stopped. Elapsed: " + str(seconds) + "s"
+        widget_set_text(time_display, message)
+        print(message)
+    
+    def reset_timer():
+        timer_reset(my_timer)
+        widget_set_text(time_display, "00:00:00.000")
+        print("Timer reset!")
+    
+    def show_elapsed():
+        let elapsed = timer_elapsed(my_timer)
+        let seconds = floor(elapsed)
+        let millis = floor((elapsed - seconds) * 1000)
+        let display_text = "Time: " + str(seconds) + "." + str(millis) + "s"
+        widget_set_text(time_display, display_text)
+    
+    # Create control buttons
+    let btn_start = gui_button(window, "▶ Start Timer")
+    let btn_stop = gui_button(window, "⏹ Stop Timer")
+    let btn_reset = gui_button(window, "↻ Reset")
+    let btn_show = gui_button(window, "⏱ Check Time")
+    
+    # Instructions
+    let instructions = gui_label(window, "Click buttons to control the timer")
+    
+    # Show the window
+    gui_show(window)
+
+# Run the timer application
+print("Sharp Timer Application")
+print("=======================")
+print("Creating GUI...")
+create_timer_app()

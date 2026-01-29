@@ -1,0 +1,9 @@
+# Test assignment in function
+def test():
+    a = 5
+    b = 3
+    c = a / b
+    print("Result:", c)
+    return c
+
+test()

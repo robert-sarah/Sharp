@@ -1,0 +1,127 @@
+# Sharp Timer & Stopwatch Example
+# Demonstrates timer functions
+
+print("Sharp Timer & Stopwatch")
+print("======================\n")
+
+# ===== Basic Timer =====
+print("1. Basic Timer")
+print("-" + str(20) + "\n")
+
+let timer1 = timer()
+print("Created timer object")
+
+timer_start(timer1)
+print("Timer started...")
+
+sleep(1)  # Simulate work
+print("Working...")
+
+sleep(0.5)
+
+let elapsed1 = timer_elapsed(timer1)
+print("Elapsed: " + str(elapsed1) + " seconds")
+
+timer_stop(timer1)
+print("Timer stopped")
+
+# ===== Multiple Timers =====
+print("\n2. Multiple Timers")
+print("-" + str(20) + "\n")
+
+let timer_task1 = timer()
+let timer_task2 = timer()
+
+# Start first task
+timer_start(timer_task1)
+print("Task 1 started")
+sleep(0.3)
+let time1 = timer_stop(timer_task1)
+print("Task 1 completed in " + str(floor(time1 * 1000)) + "ms")
+
+# Start second task
+timer_start(timer_task2)
+print("Task 2 started")
+sleep(0.5)
+let time2 = timer_stop(timer_task2)
+print("Task 2 completed in " + str(floor(time2 * 1000)) + "ms")
+
+# Compare
+if time1 < time2:
+    print("Task 1 was faster!")
+else:
+    print("Task 2 was faster!")
+
+# ===== Stopwatch Loop =====
+print("\n3. Stopwatch Loop")
+print("-" + str(20) + "\n")
+
+let stopwatch = timer()
+timer_start(stopwatch)
+
+print("Counting...")
+for i in range(0, 4):
+    sleep(0.2)
+    let current = timer_elapsed(stopwatch)
+    let formatted = floor(current * 100) / 100
+    print("Time: " + str(formatted) + "s")
+
+timer_stop(stopwatch)
+print("Stopwatch finished!")
+
+# ===== Reset Timer =====
+print("\n4. Reset Timer")
+print("-" + str(20) + "\n")
+
+let reset_timer = timer()
+timer_start(reset_timer)
+sleep(0.3)
+let before_reset = timer_elapsed(reset_timer)
+print("Elapsed before reset: " + str(floor(before_reset * 1000)) + "ms")
+
+timer_reset(reset_timer)
+print("Timer reset!")
+let after_reset = timer_elapsed(reset_timer)
+print("Elapsed after reset: " + str(after_reset) + "s")
+
+# ===== Performance Measurement =====
+print("\n5. Performance Measurement")
+print("-" + str(20) + "\n")
+
+def measure_performance(name, iterations):
+    let perf_timer = timer()
+    timer_start(perf_timer)
+    
+    let result = 0
+    for i in range(0, iterations):
+        result = result + i * i
+    
+    timer_stop(perf_timer)
+    let elapsed = timer_elapsed(perf_timer)
+    
+    print(name + ": " + str(floor(elapsed * 1000000)) + "µs for " + str(iterations) + " iterations")
+    return elapsed
+
+measure_performance("Operation A", 100)
+measure_performance("Operation B", 1000)
+measure_performance("Operation C", 10000)
+
+# ===== Timer with Functions =====
+print("\n6. Timer with Functions")
+print("-" + str(20) + "\n")
+
+def expensive_operation():
+    let sum = 0
+    for i in range(0, 1000):
+        sum = sum + i
+    return sum
+
+let func_timer = timer()
+timer_start(func_timer)
+let result = expensive_operation()
+let func_time = timer_elapsed(func_timer)
+
+print("Function took: " + str(floor(func_time * 1000)) + "ms")
+print("Result: " + str(result))
+
+print("\n✓ All timer examples completed!")

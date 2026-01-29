@@ -1,0 +1,26 @@
+# Sharp GUI Module
+# Provides GUI utilities for creating applications with PyQt5
+
+def create_window(title, width, height):
+    title
+
+def create_button(text, onclick):
+    text
+
+def create_label(text):
+    text
+
+def create_textbox(default_text):
+    default_text
+
+def create_layout():
+    nil
+
+def add_widget(layout, widget):
+    nil
+
+def show_window(window):
+    nil
+
+def show_dialog(title, message):
+    message

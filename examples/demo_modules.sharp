@@ -1,0 +1,43 @@
+# Sharp modules usage demonstration
+
+print("Sharp Modules System Demo")
+print("=" * 50)
+
+# Example 1: Math operations
+print("\n1. Math Module Operations:")
+from math import square, cube, factorial, gcd
+print("  square(7) =", square(7))
+print("  cube(5) =", cube(5))
+print("  factorial(6) =", factorial(6))
+print("  gcd(48, 18) =", gcd(48, 18))
+
+# Example 2: String utilities
+print("\n2. String Module Operations:")
+from string import capitalize, reverse, count_char, is_alpha
+print("  capitalize('hello world') =", capitalize("hello world"))
+print("  reverse('programming') =", reverse("programming"))
+print("  count_char('mississippi', 'i') =", count_char("mississippi", "i"))
+print("  is_alpha('A') =", is_alpha("A"))
+print("  is_alpha('5') =", is_alpha("5"))
+
+# Example 3: Collections utilities
+print("\n3. Collections Module Operations:")
+from collections import unique, flatten, zip_lists
+data = [1, 2, 2, 3, 3, 3, 4, 4, 5]
+print("  unique([1,2,2,3,3,3,4,4,5]) =", unique(data))
+
+nested_lists = [[1, 2], [3, 4], [5, 6]]
+print("  flatten([[1,2],[3,4],[5,6]]) =", flatten(nested_lists))
+
+list1 = [1, 2, 3]
+list2 = ["a", "b", "c"]
+print("  zip_lists([1,2,3], ['a','b','c']) =", zip_lists(list1, list2))
+
+# Example 4: Module alias
+print("\n4. Using Module Aliases:")
+import math as M
+print("  M.square(10) =", M.square(10))
+print("  M.factorial(4) =", M.factorial(4))
+
+print("\n" + "=" * 50)
+print("Module system test complete!")

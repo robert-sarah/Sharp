@@ -1,0 +1,71 @@
+# Temperature Converter Application
+# Demonstrates Sharp GUI with real calculations
+
+import pyqt5_wrapper as gui
+
+# Create converter window
+converter = gui.create_window("Sharp Temperature Converter", 500, 400)
+
+# Title and description
+converter.add_label("title", "🌡️ Temperature Converter")
+converter.add_label("description", "Convert between Celsius, Fahrenheit, and Kelvin")
+
+# Input field
+converter.add_label("input_label", "Enter Temperature Value:")
+converter.add_textbox("temp_input", "0")
+
+# Conversion functions
+def celsius_to_fahrenheit(c):
+    c * 9 / 5 + 32
+
+def celsius_to_kelvin(c):
+    c + 273.15
+
+def fahrenheit_to_celsius(f):
+    (f - 32) * 5 / 9
+
+def kelvin_to_celsius(k):
+    k - 273.15
+
+# Conversion buttons
+def convert_to_fahrenheit():
+    try:
+        celsius = int(converter.get_text("temp_input"))
+        fahrenheit = celsius * 9 / 5 + 32
+        result = str(celsius) + "°C = " + str(fahrenheit) + "°F"
+        converter.set_text("result", result)
+    except:
+        converter.set_text("result", "Invalid input")
+
+def convert_to_kelvin():
+    try:
+        celsius = int(converter.get_text("temp_input"))
+        kelvin = celsius + 273.15
+        result = str(celsius) + "°C = " + str(kelvin) + "K"
+        converter.set_text("result", result)
+    except:
+        converter.set_text("result", "Invalid input")
+
+def convert_from_fahrenheit():
+    try:
+        fahrenheit = int(converter.get_text("temp_input"))
+        celsius = (fahrenheit - 32) * 5 / 9
+        result = str(fahrenheit) + "°F = " + str(celsius) + "°C"
+        converter.set_text("result", result)
+    except:
+        converter.set_text("result", "Invalid input")
+
+# Result display
+converter.add_label("result_label", "Conversion Result:")
+converter.add_textbox("result", "Result will appear here")
+
+# Action buttons
+converter.add_button("to_f", "To Fahrenheit", convert_to_fahrenheit)
+converter.add_button("to_k", "To Kelvin", convert_to_kelvin)
+converter.add_button("from_f", "From Fahrenheit", convert_from_fahrenheit)
+
+# Show the window
+converter.show()
+
+print("🌡️ Temperature Converter Application Started!")
+print("Enter a temperature value and click a conversion button")

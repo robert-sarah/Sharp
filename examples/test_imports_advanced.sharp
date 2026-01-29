@@ -1,0 +1,35 @@
+# Test module imports with aliases
+print("Sharp Module Import with Aliases")
+print("=" * 40)
+
+# Test 1: Import entire module with alias
+print("\nTest 1: Import math as m")
+import math as m
+print("m.square(4) =", m.exports["square"](4))
+print("m.factorial(4) =", m.exports["factorial"](4))
+
+# Test 2: Import with from ... import
+print("\nTest 2: from string import capitalize, reverse")
+from string import capitalize, reverse
+print("capitalize('python') =", capitalize("python"))
+print("reverse('hello') =", reverse("hello"))
+
+# Test 3: Import with alias in from
+print("\nTest 3: from string import reverse as flip")
+from string import reverse as flip
+print("flip('sharp') =", flip("sharp"))
+
+# Test 4: Mix of imports
+print("\nTest 4: Multiple functions")
+from math import square, cube, factorial
+from string import count_char
+from collections import unique, flatten
+
+numbers = [1, 2, 3]
+print("Squares:", [square(x) for x in numbers])
+print("Cubes:", [cube(x) for x in numbers])
+
+text = "hello"
+print("Count 'l' in 'hello':", count_char(text, "l"))
+
+print("\nAll import tests completed!")

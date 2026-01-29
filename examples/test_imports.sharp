@@ -1,0 +1,28 @@
+# Test module imports
+print("Sharp Module Import Test")
+print("=" * 40)
+
+# Test 1: Import math module functions
+print("\nTest 1: Math Module")
+from math import square, cube, factorial
+print("square(5) =", square(5))
+print("cube(3) =", cube(3))
+print("factorial(5) =", factorial(5))
+
+# Test 2: Import string module functions
+print("\nTest 2: String Module")
+from string import capitalize, reverse, count_char
+print("capitalize('hello') =", capitalize("hello"))
+print("reverse('sharp') =", reverse("sharp"))
+print("count_char('mississippi', 's') =", count_char("mississippi", "s"))
+
+# Test 3: Import collections
+print("\nTest 3: Collections Module")
+from collections import unique, flatten
+numbers = [1, 2, 2, 3, 3, 3, 4]
+print("unique([1,2,2,3,3,3,4]) =", unique(numbers))
+
+nested = [[1, 2], [3, 4], [5, 6]]
+print("flatten([[1,2], [3,4], [5,6]]) =", flatten(nested))
+
+print("\nAll tests completed!")

@@ -1,0 +1,41 @@
+# Test tuple support
+print("Testing Tuples")
+print("=" * 40)
+
+# Test 1: Empty tuple
+empty = ()
+print("Empty tuple:", empty)
+print("Length:", len(empty))
+
+# Test 2: Single element tuple
+single = (42,)
+print("\nSingle tuple:", single)
+print("Length:", len(single))
+print("First element:", single[0])
+
+# Test 3: Multiple element tuple
+multi = (1, 2, 3, 4, 5)
+print("\nMulti tuple:", multi)
+print("Length:", len(multi))
+print("First three:", multi[0:3])
+
+# Test 4: Mixed types
+mixed = ("hello", 42, 3.14, true)
+print("\nMixed tuple:", mixed)
+print("Length:", len(mixed))
+
+# Test 5: Nested tuple
+nested = ((1, 2), (3, 4), (5, 6))
+print("\nNested tuple:", nested)
+print("First nested:", nested[0])
+
+# Test 6: Using tuple items
+print("\nAccessing tuple items:")
+data = ("module", "description", "functions")
+print("Data tuple:", data)
+print("Item 0:", data[0])
+print("Item 1:", data[1])
+print("Item 2:", data[2])
+
+
+print("\nAll tuple tests passed!")

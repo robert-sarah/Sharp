@@ -1,0 +1,56 @@
+# Sharp Math Module
+# Provides mathematical functions and constants
+
+# Constants (as functions)
+def pi():
+    3.141592653589793
+
+def e():
+    2.718281828459045
+
+def tau():
+    6.283185307179586
+
+# Functions (most are already in stdlib, but we expose them here)
+def square(x):
+    x * x
+
+def cube(x):
+    x * x * x
+
+def average(numbers):
+    sum(numbers) / len(numbers)
+
+def factorial_helper(n, acc):
+    if n <= 1:
+        acc
+    else:
+        factorial_helper(n - 1, n * acc)
+
+def factorial(n):
+    factorial_helper(n, 1)
+
+def gcd_helper(a, b):
+    if b == 0:
+        a
+    else:
+        gcd_helper(b, a % b)
+
+def gcd(a, b):
+    gcd_helper(abs(a), abs(b))
+
+def lcm(a, b):
+    abs(a * b) / gcd(a, b)
+
+def is_prime(n):
+    if n < 2:
+        false
+    else:
+        def check_divisor(d):
+            if d * d > n:
+                true
+            elif n % d == 0:
+                false
+            else:
+                check_divisor(d + 1)
+        check_divisor(2)

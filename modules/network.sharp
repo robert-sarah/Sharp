@@ -1,0 +1,28 @@
+# Network Utilities Module
+def is_valid_ip(ip):
+    parts = split(ip, ".")
+    if len(parts) != 4:
+        false
+    else:
+        true
+
+def is_valid_url(url):
+    (url in "http://" or url in "https://")
+
+def parse_url(url):
+    parts = split(url, "://")
+    if len(parts) == 2:
+        protocol = parts[0]
+        rest = parts[1]
+        path_parts = split(rest, "/")
+        domain = path_parts[0]
+        [protocol, domain]
+    else:
+        []
+
+def get_domain(url):
+    parts = parse_url(url)
+    if len(parts) > 0:
+        parts[1]
+    else:
+        ""

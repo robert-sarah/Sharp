@@ -1,0 +1,48 @@
+# Sharp Standard Modules System
+# List all available modules and their descriptions
+
+print("Sharp Standard Library")
+print("=" * 50)
+print()
+
+print("Built-in Modules (Sharp):")
+print("  math         - Mathematical functions and constants")
+print("  string       - String manipulation utilities")
+print("  collections - Collection utilities (lists, dicts)")
+print("  gui          - GUI framework bindings")
+print()
+
+print("Python Modules (Imported):")
+print("  pyqt5_wrapper - PyQt5 GUI toolkit integration")
+print("  wxgui         - wxPython GUI toolkit integration")
+print()
+
+print("Standard Library Access:")
+print("  import math")
+print("  import string")
+print("  import collections")
+print()
+
+print("Advanced Syntax Examples:")
+print("  import math as m")
+print("  from math import square, factorial")
+print("  from string import capitalize, reverse")
+print()
+
+# Demonstrate module usage
+print("Example: Using modules")
+print("-" * 50)
+
+from math import square, factorial
+from string import reverse, capitalize
+from collections import unique, flatten
+
+print("square(5) =", square(5))
+print("factorial(4) =", factorial(4))
+print("reverse('hello') =", reverse("hello"))
+print("capitalize('world') =", capitalize("world"))
+print("unique([1,2,2,3,3,3]) =", unique([1, 2, 2, 3, 3, 3]))
+print("flatten([[1,2],[3,4]]) =", flatten([[1, 2], [3, 4]]))
+
+print()
+print("Module system test complete!")

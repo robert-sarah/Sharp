@@ -1,0 +1,45 @@
+# GUI Application Example - Calculator
+# Demonstrates Sharp GUI capabilities with PyQt5
+
+import pyqt5_wrapper as gui
+
+# Create main window
+window = gui.create_window("Sharp Calculator", 400, 500)
+
+# Add title
+window.add_label("title", "Sharp Calculator App")
+
+# Add display
+window.add_textbox("display", "0")
+
+# Create a simple calculator
+def button_click(num):
+    current = window.get_text("display")
+    if current == "0":
+        window.set_text("display", str(num))
+    else:
+        window.set_text("display", current + str(num))
+
+def clear():
+    window.set_text("display", "0")
+
+def calculate():
+    expr = window.get_text("display")
+    try:
+        result = eval(expr)
+        window.set_text("display", str(result))
+    except:
+        window.set_text("display", "Error")
+
+# Add buttons for numbers
+for i in range(10):
+    pass
+
+# Add operation buttons
+window.add_button("clear_btn", "Clear", clear)
+window.add_button("calc_btn", "Calculate", calculate)
+
+# Show the window
+window.show()
+
+print("Calculator app started!")

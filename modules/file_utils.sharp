@@ -1,0 +1,48 @@
+# File System Utilities Module
+def file_exists(path):
+    import os
+    os.path.exists(path)
+
+def read_file(path):
+    try:
+        f = open(path, "r")
+        content = f.read()
+        f.close()
+        content
+    except:
+        ""
+
+def write_file(path, content):
+    try:
+        f = open(path, "w")
+        f.write(content)
+        f.close()
+        true
+    except:
+        false
+
+def delete_file(path):
+    import os
+    try:
+        os.remove(path)
+        true
+    except:
+        false
+
+def list_files(directory):
+    import os
+    os.listdir(directory)
+
+def get_file_size(path):
+    import os
+    try:
+        os.path.getsize(path)
+    except:
+        -1
+
+def get_file_extension(filename):
+    parts = split(filename, ".")
+    if len(parts) > 1:
+        parts[-1]
+    else:
+        ""

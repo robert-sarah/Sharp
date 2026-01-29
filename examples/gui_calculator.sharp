@@ -1,0 +1,61 @@
+# Sharp GUI Application Example
+# Interactive Calculator with GUI
+
+def create_calculator_app():
+    # Create main window
+    let window = gui_window("Sharp Calculator", 400, 500)
+    
+    # Create display
+    let display = gui_textarea(window, 3, 40)
+    widget_set_text(display, "0")
+    
+    # Create button grid
+    let buttons = [
+        ["7", "8", "9", "/"],
+        ["4", "5", "6", "*"],
+        ["1", "2", "3", "-"],
+        ["0", ".", "=", "+"]
+    ]
+    
+    # State variables
+    let current_input = "0"
+    let operator = nil
+    let previous_value = 0
+    let should_reset = false
+    
+    # Button click handler
+    def on_button_click(value):
+        if value == "=":
+            # Calculate result
+            print("Calculating...")
+        elif value in ["+", "-", "*", "/"]:
+            # Set operator
+            print("Operator: " + value)
+        else:
+            # Add to input
+            if should_reset:
+                current_input = value
+                should_reset = false
+            else:
+                if current_input == "0":
+                    current_input = value
+                else:
+                    current_input = current_input + value
+            widget_set_text(display, current_input)
+    
+    # Create buttons dynamically
+    for row in buttons:
+        for btn_text in row:
+            let btn = gui_button(window, btn_text)
+            print("Button created: " + btn_text)
+    
+    # Clear button
+    let clear_btn = gui_button(window, "Clear")
+    
+    # Show the window
+    gui_show(window)
+
+# Run the application
+print("Sharp GUI Calculator")
+print("====================")
+create_calculator_app()

@@ -1,0 +1,7 @@
+# Simple test
+from math import square
+
+print("Testing square function")
+x = 5
+result = square(x)
+print("Result:", result)

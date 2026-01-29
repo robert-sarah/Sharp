@@ -1,0 +1,14 @@
+# Test 'in' operator
+numbers = [1, 2, 3, 4, 5]
+fruits = ["apple", "banana", "orange"]
+
+print("Testing 'in' operator:")
+print(3 in numbers)
+print(10 in numbers)
+print("apple" in fruits)
+print("grape" in fruits)
+
+# Test with strings
+message = "Hello, World!"
+print("H" in message)
+print("xyz" in message)

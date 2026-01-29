@@ -1,0 +1,42 @@
+# Text Processing Module
+def word_count(text):
+    words = split(text, " ")
+    len(words)
+
+def char_frequency(text):
+    def freq_helper(chars, acc, i):
+        if i >= len(chars):
+            acc
+        else:
+            char = chars[i]
+            freq_helper(chars, acc + [char], i + 1)
+    chars = []
+    for c in text:
+        chars = chars + [c]
+    freq_helper(chars, [], 0)
+
+def remove_whitespace(text):
+    def remove_helper(i, acc):
+        if i >= len(text):
+            acc
+        else:
+            char = text[i]
+            if char != " " and char != "\t" and char != "\n":
+                remove_helper(i + 1, acc + char)
+            else:
+                remove_helper(i + 1, acc)
+    remove_helper(0, "")
+
+def is_palindrome(text):
+    clean = remove_whitespace(lower(text))
+    clean == reverse(clean)
+
+def word_frequency(text):
+    words = split(lower(text), " ")
+    unique(words)
+
+def truncate(text, length):
+    if len(text) > length:
+        text[0:length] + "..."
+    else:
+        text

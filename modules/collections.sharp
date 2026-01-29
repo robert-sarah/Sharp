@@ -1,0 +1,26 @@
+# Sharp Collections Module
+# Provides utilities for working with lists, dicts, and collections
+
+def flatten(lists):
+    result = []
+    for lst in lists:
+        for item in lst:
+            result = result + [item]
+    result
+
+def unique(lst):
+    seen = []
+    result = []
+    for item in lst:
+        if not (item in seen):
+            seen = seen + [item]
+            result = result + [item]
+    result
+
+def zip_lists(list1, list2):
+    def zip_helper(i, acc):
+        if i >= len(list1) or i >= len(list2):
+            acc
+        else:
+            zip_helper(i + 1, acc + [[list1[i], list2[i]]])
+    zip_helper(0, [])

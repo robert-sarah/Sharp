@@ -1,0 +1,28 @@
+# Function definitions and closures
+
+def make_multiplier(n):
+    def multiply(x):
+        return x * n
+    return multiply
+
+let times_3 = make_multiplier(3)
+let times_5 = make_multiplier(5)
+
+print("10 * 3 = " + str(times_3(10)))
+print("10 * 5 = " + str(times_5(10)))
+
+# Higher-order function
+def apply_twice(func, x):
+    return func(func(x))
+
+def add_one(x):
+    return x + 1
+
+print("apply_twice(add_one, 5) = " + str(apply_twice(add_one, 5)))
+
+# Lambda functions
+let square = lambda x: x * x
+let add = lambda x, y: x + y
+
+print("square(7) = " + str(square(7)))
+print("add(3, 4) = " + str(add(3, 4)))

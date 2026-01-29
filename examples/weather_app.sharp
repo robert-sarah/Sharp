@@ -1,0 +1,84 @@
+# Sharp Weather App Example
+# Demonstrates network requests and data processing
+
+print("Sharp Weather Application")
+print("=========================\n")
+
+# Weather data structure (simplified without dict literals in functions)
+def create_weather_data():
+    let paris = ["Paris", 15.5, 65, "Cloudy"]
+    let london = ["London", 12.3, 72, "Rainy"]
+    let berlin = ["Berlin", 14.2, 68, "Partly Cloudy"]
+    let amsterdam = ["Amsterdam", 13.8, 70, "Overcast"]
+    return [paris, london, berlin, amsterdam]
+
+let weather_data = create_weather_data()
+
+print("Current Weather Status:")
+print("-" + str(len(weather_data)) + " cities monitored\n")
+
+# Display weather
+def display_weather(weather):
+    let city = weather[0]
+    let temp = weather[1]
+    let humidity = weather[2]
+    let condition = weather[3]
+    
+    print(city + ": " + str(temp) + "°C, " + str(humidity) + "% humidity")
+    print("  Condition: " + condition)
+
+# Show all weather
+for w in weather_data:
+    display_weather(w)
+
+# Calculate average temperature
+print("\nWeather Analysis:")
+print("-" + str(len(weather_data)) + " cities\n")
+
+let temps = []
+for w in weather_data:
+    temps = temps + [w[1]]
+
+let avg_temp = sum(temps) / len(temps)
+let max_temp = max(temps)
+let min_temp = min(temps)
+
+print("Average Temperature: " + str(floor(avg_temp * 10) / 10) + "°C")
+print("Highest Temperature: " + str(max_temp) + "°C")
+print("Lowest Temperature: " + str(min_temp) + "°C")
+
+# Find warmest city
+print("\nCities by Temperature:")
+print("-" + str(len(weather_data)) + " cities\n")
+
+for w in weather_data:
+    print(w[0] + ": " + str(w[1]) + "°C")
+
+# Weather alerts
+print("\nWeather Alerts:")
+print("-" + str(len(weather_data)) + " cities\n")
+
+for w in weather_data:
+    let temp = w[1]
+    let humidity = w[2]
+    let city = w[0]
+    
+    if temp < 5:
+        print("⚠ " + city + ": Cold weather alert!")
+    elif temp > 25:
+        print("⚠ " + city + ": Hot weather alert!")
+    
+    if humidity > 80:
+        print("💧 " + city + ": High humidity!")
+
+# Filter by condition
+print("\nRainy Cities:")
+print("-" + str(len(weather_data)) + " cities\n")
+
+for w in weather_data:
+    let condition = w[3]
+    let is_rainy = contains(condition, "Rain") or contains(condition, "rain")
+    if is_rainy:
+        print("🌧 " + w[0] + " - " + condition)
+
+print("\n✓ Weather application complete!")

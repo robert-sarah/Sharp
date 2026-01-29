@@ -1,0 +1,72 @@
+# Sharp Programming Language - Variables Example
+# Like Python, create and use variables
+
+# Integer variables
+let age = 25
+let count = 100
+print("Age: " + str(age))
+print("Count: " + str(count))
+
+# String variables
+let name = "Alice"
+let greeting = "Hello, " + name
+print(greeting)
+
+# Floating point
+let pi = 3.14159
+let radius = 5
+let area = pi * radius * radius
+print("Circle area: " + str(area))
+
+# Boolean variables
+let is_active = true
+let is_empty = false
+
+if is_active:
+    print("System is active")
+
+# List variables
+let fruits = ["apple", "banana", "orange"]
+print("Fruits: " + str(fruits))
+print("First fruit: " + fruits[0])
+print("Number of fruits: " + str(len(fruits)))
+
+# Dictionary variables
+let person = {"name": "Bob", "age": 30, "city": "Paris"}
+print("Person: " + str(person))
+print("Name: " + person["name"])
+
+# Using variables in loops
+let total = 0
+for i in range(1, 6):
+    total = total + i
+print("Sum of 1-5: " + str(total))
+
+# Function with variables
+def calculate_discount(price, discount_percent):
+    let discount_amount = price * discount_percent / 100
+    let final_price = price - discount_amount
+    return final_price
+
+let item_price = 100
+let discounted = calculate_discount(item_price, 10)
+print("Price: " + str(item_price) + ", Discounted: " + str(discounted))
+
+# List comprehension with variables
+let numbers = [1, 2, 3, 4, 5]
+let squared = [x * x for x in numbers]
+print("Original: " + str(numbers))
+print("Squared: " + str(squared))
+
+# Lambda functions with variables
+let add_five = lambda x: x + 5
+let result = add_five(10)
+print("10 + 5 = " + str(result))
+
+# Modify variables
+let counter = 0
+while counter < 3:
+    print("Counter: " + str(counter))
+    counter = counter + 1
+
+print("\nAll examples completed!")

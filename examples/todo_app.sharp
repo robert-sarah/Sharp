@@ -1,0 +1,53 @@
+# Professional Todo Application with Sharp and PyQt5
+# Demonstrates real GUI application development
+
+import pyqt5_wrapper as gui
+
+# Create main window for todo app
+app_window = gui.create_window("Sharp Todo Manager", 600, 500)
+
+# Add title
+app_window.add_label("title", "📝 Sharp Todo Manager")
+app_window.add_label("subtitle", "Manage your tasks efficiently")
+
+# Add task input
+app_window.add_textbox("task_input", "Enter a new task...")
+
+# Add task list (text area for now)
+app_window.add_textarea("task_list", "Your tasks will appear here...\n")
+
+# Global task list
+tasks = []
+
+def add_task():
+    task_text = app_window.get_text("task_input")
+    if len(task_text) > 0:
+        tasks = tasks + [task_text]
+        
+        # Update display
+        task_display = "Tasks:\n"
+        task_count = 0
+        for task in tasks:
+            task_count = task_count + 1
+            task_display = task_display + str(task_count) + ". " + task + "\n"
+        
+        app_window.set_text("task_list", task_display)
+        app_window.set_text("task_input", "")
+
+def clear_all():
+    tasks = []
+    app_window.set_text("task_list", "Your tasks will appear here...\n")
+    app_window.set_text("task_input", "")
+
+# Add buttons
+app_window.add_button("add_btn", "➕ Add Task", add_task)
+app_window.add_button("clear_btn", "🗑️ Clear All", clear_all)
+
+# Show the window
+app_window.show()
+
+print("✅ Todo Manager Application Started!")
+print("Features:")
+print("  - Add new tasks")
+print("  - View all tasks")
+print("  - Clear task list")

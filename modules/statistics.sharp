@@ -1,0 +1,39 @@
+# Statistics Module
+def mean(numbers):
+    if len(numbers) == 0:
+        0
+    else:
+        sum(numbers) / len(numbers)
+
+def median(numbers):
+    sorted_nums = sorted(numbers)
+    n = len(sorted_nums)
+    if n % 2 == 0:
+        (sorted_nums[n / 2 - 1] + sorted_nums[n / 2]) / 2
+    else:
+        sorted_nums[n / 2]
+
+def mode(numbers):
+    def find_max(lst):
+        if len(lst) == 0:
+            nil
+        else:
+            max(lst)
+    counts = []
+    for num in unique(numbers):
+        count = count_char(str(numbers), str(num))
+        counts = counts + [count]
+    find_max(counts)
+
+def variance(numbers):
+    m = mean(numbers)
+    squared_diffs = []
+    for num in numbers:
+        squared_diffs = squared_diffs + [(num - m) * (num - m)]
+    mean(squared_diffs)
+
+def standard_deviation(numbers):
+    sqrt(variance(numbers))
+
+def range_stats(numbers):
+    max(numbers) - min(numbers)

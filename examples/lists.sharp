@@ -1,0 +1,26 @@
+# List operations and comprehensions
+
+let nums = [1, 2, 3, 4, 5]
+print("Original list: " + str(nums))
+
+# List comprehension
+let squares = [x * x for x in nums]
+print("Squares: " + str(squares))
+
+# Filter with comprehension
+let evens = [x for x in nums if x % 2 == 0]
+print("Even numbers: " + str(evens))
+
+# Map using built-in
+let doubled = map(lambda x: x * 2, nums)
+print("Doubled: " + str(doubled))
+
+# Sum and length
+let total = sum(nums)
+let count = len(nums)
+print("Sum: " + str(total))
+print("Count: " + str(count))
+
+# Min and max
+print("Min: " + str(min(nums)))
+print("Max: " + str(max(nums)))

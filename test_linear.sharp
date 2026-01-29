@@ -1,0 +1,8 @@
+# Test algorithms import
+from algorithms import linear_search
+
+print("Testing linear_search")
+arr = [5, 2, 8, 1, 9, 3]
+print("Array:", arr)
+idx = linear_search(arr, 8)
+print("Index:", idx)

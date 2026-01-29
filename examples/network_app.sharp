@@ -1,0 +1,64 @@
+# Sharp Network Application Examples
+# HTTP requests and network operations
+
+print("Sharp Network Applications")
+print("============================\n")
+
+# ===== HTTP GET Example =====
+print("1. HTTP GET Request")
+print("-------------------")
+
+def fetch_data(url):
+    print("Fetching from: " + url)
+    try:
+        let response = http_get(url)
+        print("Response received!")
+        print("Length: " + str(len(response)) + " bytes")
+        return response
+    except:
+        print("Error: Could not fetch from " + url)
+        return nil
+
+print("HTTP GET example created")
+
+# ===== HTTP POST Example =====
+print("\n2. HTTP POST Request")
+print("-------------------")
+
+def send_data(url, payload):
+    print("Sending data to: " + url)
+    print("Payload: " + str(payload))
+    
+    try:
+        let response = http_post(url, payload)
+        print("Data sent successfully!")
+        return response
+    except:
+        print("Error: Could not send data")
+        return nil
+
+print("HTTP POST example created")
+
+# ===== Data Processing =====
+print("\n3. Data Processing")
+print("------------------")
+
+def process_json_response(json_str):
+    try:
+        let data = json_loads(json_str)
+        print("Parsed JSON successfully")
+        return data
+    except:
+        print("Error: Invalid JSON")
+        return nil
+
+def convert_to_json(data):
+    try:
+        let json_str = json_dumps(data)
+        print("Converted to JSON: " + json_str)
+        return json_str
+    except:
+        print("Error: Could not convert to JSON")
+        return nil
+
+print("\n✓ Network application examples created!")

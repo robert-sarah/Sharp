@@ -1,0 +1,44 @@
+# Algorithms Module
+def bubble_sort(arr):
+    n = len(arr)
+    def bubble_helper(i):
+        if i >= n:
+            return arr
+        else:
+            def inner_loop(j):
+                if j >= n - i - 1:
+                    return nil
+                else:
+                    if arr[j] > arr[j + 1]:
+                        temp = arr[j]
+                        arr[j] = arr[j + 1]
+                        arr[j + 1] = temp
+                    return inner_loop(j + 1)
+            inner_loop(0)
+            return bubble_helper(i + 1)
+    bubble_helper(0)
+    return arr
+
+def binary_search(arr, target):
+    def search(low, high):
+        if low > high:
+            return -1
+        else:
+            mid = (low + high) / 2
+            if arr[mid] == target:
+                return mid
+            elif arr[mid] < target:
+                return search(mid + 1, high)
+            else:
+                return search(low, mid - 1)
+    return search(0, len(arr) - 1)
+
+def linear_search(arr, target):
+    def search_helper(i):
+        if i >= len(arr):
+            return -1
+        elif arr[i] == target:
+            return i
+        else:
+            return search_helper(i + 1)
+    return search_helper(0)

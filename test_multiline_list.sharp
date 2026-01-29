@@ -1,0 +1,18 @@
+# Test multi-line list
+colors = [
+    "red",
+    "green",
+    "blue",
+    "yellow",
+    "purple"
+]
+
+print("Colors list:")
+for color in colors:
+    print("  -", color)
+
+# Test list comprehension
+numbers = [1, 2, 3, 4, 5]
+squared = [x * x for x in numbers]
+print("\nSquared numbers:")
+print(squared)

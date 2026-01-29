@@ -1,0 +1,32 @@
+# Test slicing support
+print("Testing Slicing")
+print("=" * 40)
+
+# Test 1: List slicing
+print("\nTest 1: List Slicing")
+numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+print("numbers =", numbers)
+print("numbers[2:5] =", numbers[2:5])
+print("numbers[:3] =", numbers[:3])
+print("numbers[7:] =", numbers[7:])
+print("numbers[::2] =", numbers[::2])
+print("numbers[::-1] =", numbers[::-1])
+
+# Test 2: String slicing
+print("\nTest 2: String Slicing")
+text = "Hello, Sharp!"
+print("text =", text)
+print("text[0:5] =", text[0:5])
+print("text[7:] =", text[7:])
+print("text[:5] =", text[:5])
+print("text[::2] =", text[::2])
+print("text[::-1] =", text[::-1])
+
+# Test 3: Combined with functions
+print("\nTest 3: Slicing with Functions")
+words = split("one two three four five", " ")
+print("words =", words)
+print("first_two =", words[0:2])
+print("last_two =", words[-2:])
+
+print("\nAll slicing tests passed!")

@@ -1,0 +1,9 @@
+# Test algorithms module
+from algorithms import linear_search, bubble_sort
+
+search_list = [5, 2, 8, 1, 9, 3]
+target = 8
+print("List:", search_list)
+print("Finding:", target)
+result = linear_search(search_list, target)
+print("Index:", result)

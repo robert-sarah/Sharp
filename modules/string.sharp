@@ -1,0 +1,46 @@
+# Sharp String Module
+# Provides string manipulation utilities
+
+def is_digit(c):
+    c in "0123456789"
+
+def is_alpha(c):
+    (c in "abcdefghijklmnopqrstuvwxyz") or (c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+def is_alnum(c):
+    is_alpha(c) or is_digit(c)
+
+def is_space(c):
+    c in " \t\n\r"
+
+def capitalize(s):
+    if len(s) == 0:
+        s
+    else:
+        upper(s[0]) + lower(s[1])
+
+def repeat(s, count):
+    def repeat_helper(acc, n):
+        if n <= 0:
+            acc
+        else:
+            repeat_helper(acc + s, n - 1)
+    repeat_helper("", count)
+
+def reverse(s):
+    def reverse_helper(i, acc):
+        if i < 0:
+            acc
+        else:
+            reverse_helper(i - 1, acc + s[i])
+    reverse_helper(len(s) - 1, "")
+
+def count_char(s, c):
+    def count_helper(i, acc):
+        if i >= len(s):
+            acc
+        elif s[i] == c:
+            count_helper(i + 1, acc + 1)
+        else:
+            count_helper(i + 1, acc)
+    count_helper(0, 0)
