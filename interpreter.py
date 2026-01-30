@@ -935,3 +935,21 @@ class Interpreter:
         
         return result
 
+    def eval_global_stmt(self, node: GlobalStmt):
+        """Evaluate global statement."""
+        # Mark variables as global in current environment
+        for name in node.names:
+            if not hasattr(self.current_env, 'globals'):
+                self.current_env.globals = set()
+            self.current_env.globals.add(name)
+        return SharpNil()
+
+    def eval_nonlocal_stmt(self, node: NonlocalStmt):
+        """Evaluate nonlocal statement."""
+        # Mark variables as nonlocal in current environment
+        for name in node.names:
+            if not hasattr(self.current_env, 'nonlocals'):
+                self.current_env.nonlocals = set()
+            self.current_env.nonlocals.add(name)
+        return SharpNil()
+
