@@ -9,6 +9,14 @@
 # - With statements
 # - Raise statements
 
+from lexer import TokenType
+from ast_nodes import (
+    ClassDef, DecoratedFunction, DecoratedClass, Decorator,
+    TryStmt, ExceptHandler, RaiseStmt, WithStmt, YieldStmt,
+    AsyncFunctionDef, AsyncForLoop, AsyncWithStmt,
+    ASTNode
+)
+
 def parse_class(self) -> ClassDef:
     """Parse class definition."""
     self.expect(TokenType.CLASS)
@@ -225,3 +233,16 @@ def parse_decorator(self) -> ASTNode:
         return DecoratedClass(decorators, cls)
     else:
         self.error("Decorator must precede a function or class definition")
+
+# This function is called by parser.py to register all extension methods
+def register_parser_extensions(parser_class):
+    """Register all extension methods to the Parser class."""
+    parser_class.parse_class = parse_class
+    parser_class.parse_async = parse_async
+    parser_class.parse_async_for = parse_async_for
+    parser_class.parse_async_with = parse_async_with
+    parser_class.parse_try = parse_try
+    parser_class.parse_raise = parse_raise
+    parser_class.parse_with = parse_with
+    parser_class.parse_yield = parse_yield
+    parser_class.parse_decorator = parse_decorator

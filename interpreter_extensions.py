@@ -1,17 +1,22 @@
 """
-Interpreter evaluation methods for Sharp language extensions.
-This contains the eval_* methods for:
-- Classes
-- Decorators  
+Interpreter extension methods for Sharp language.
+This file contains evaluation methods for:
+- Classes & OOP
+- Decorators
 - Exception handling
 - Generators
 - Async/await
-- Type annotations
+- Context managers
 """
 
-# To be injected into the Interpreter class
+from ast_nodes import (
+    ClassDef, DecoratedFunction, DecoratedClass,
+    TryStmt, RaiseStmt, WithStmt, YieldStmt,
+    AsyncFunctionDef, AwaitExpr, AsyncForLoop, AsyncWithStmt,
+    FunctionDef, VarDecl
+)
 
-def eval_class_def(self, node: ClassDef, env: Environment) -> SharpClass:
+def eval_class_def(self, node: ClassDef) -> 'SharpClass':
     """Evaluate class definition."""
     # Resolve base classes
     bases = []
@@ -126,6 +131,7 @@ def eval_with_stmt(self, node: WithStmt, env: Environment):
     """Evaluate with statement (context manager)."""
     context = self.eval(node.context_expr, env)
     
+    result = None
     # Call __enter__
     if hasattr(context, '__enter__'):
         result = context.__enter__()
@@ -135,11 +141,13 @@ def eval_with_stmt(self, node: WithStmt, env: Environment):
     try:
         # Execute body
         for stmt in node.body:
-            self.eval(stmt, env)
+            result = self.eval(stmt, env)
     finally:
         # Call __exit__
         if hasattr(context, '__exit__'):
             context.__exit__(None, None, None)
+    
+    return result
 
 def eval_yield_stmt(self, node: YieldStmt, env: Environment):
     """Evaluate yield statement (generator)."""
@@ -195,6 +203,8 @@ def eval_async_with_stmt(self, node: AsyncWithStmt, env: Environment):
     finally:
         if hasattr(context, '__aexit__'):
             context.__aexit__(None, None, None)
+    
+    return None
 
 def eval_function_call_with_self(self, func: Any, args: List[Any], kwargs: Dict[str, Any], env: Environment):
     """Evaluate function call with self binding for methods."""
@@ -228,3 +238,18 @@ def eval_function_call_with_self(self, func: Any, args: List[Any], kwargs: Dict[
         return func(*args, **kwargs)
     else:
         raise SharpRuntimeError(f"'{func}' is not callable")
+
+# This function is called by interpreter.py to register all extension methods
+def register_interpreter_extensions(interpreter_class):
+    """Register all extension methods to the Interpreter class."""
+    interpreter_class.eval_class_def = eval_class_def
+    interpreter_class.eval_decorated_function = eval_decorated_function
+    interpreter_class.eval_decorated_class = eval_decorated_class
+    interpreter_class.eval_try_stmt = eval_try_stmt
+    interpreter_class.eval_raise_stmt = eval_raise_stmt
+    interpreter_class.eval_with_stmt = eval_with_stmt
+    interpreter_class.eval_yield_stmt = eval_yield_stmt
+    interpreter_class.eval_async_function_def = eval_async_function_def
+    interpreter_class.eval_await_expr = eval_await_expr
+    interpreter_class.eval_async_for_loop = eval_async_for_loop
+    interpreter_class.eval_async_with_stmt = eval_async_with_stmt

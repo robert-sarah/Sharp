@@ -70,6 +70,15 @@ class IntelligentAutoCompleter:
         'match': ['{', 'case'],
         'case': [':', '=>'],
         'type': ['{', ':'],
+        'class': ['(', ':'],
+        'try': [':'],
+        'except': [':', 'Exception'],
+        'finally': [':'],
+        'with': ['as'],
+        'raise': ['Exception', 'identifier'],
+        'async': ['def', 'for', 'with'],
+        'await': ['identifier', '('],
+        'yield': ['identifier', 'number', 'string'],
         '[': [']', ','],
         '{': ['}', ':', ','],
         '(': [')', ','],
@@ -94,7 +103,9 @@ class IntelligentAutoCompleter:
     KEYWORDS = [
         'def', 'let', 'if', 'elif', 'else', 'while', 'for', 'in', 'return',
         'break', 'continue', 'match', 'case', 'type', 'import', 'from', 'as',
-        'lambda', 'true', 'false', 'nil', 'and', 'or', 'not'
+        'lambda', 'true', 'false', 'nil', 'and', 'or', 'not',
+        'class', 'try', 'except', 'finally', 'with', 'raise', 'async', 'await', 'yield',
+        'self', 'super', 'pass'
     ]
     
     def __init__(self):

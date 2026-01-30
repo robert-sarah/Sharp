@@ -1028,3 +1028,4 @@ class Parser:
             return DecoratedClass(decorators, cls)
         else:
             self.error("Decorator must precede a function or class definition")
+
