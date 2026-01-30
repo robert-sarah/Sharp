@@ -39,6 +39,21 @@ class TokenType(Enum):
     AS = auto()
     CLASS = auto()
     PASS = auto()
+    ASYNC = auto()
+    AWAIT = auto()
+    YIELD = auto()
+    TRY = auto()
+    EXCEPT = auto()
+    FINALLY = auto()
+    WITH = auto()
+    RAISE = auto()
+    SELF = auto()
+    SUPER = auto()
+    INIT = auto()
+    STATICMETHOD = auto()
+    CLASSMETHOD = auto()
+    PROPERTY = auto()
+    AT = auto()
 
     # Operators
     PLUS = auto()
@@ -136,6 +151,20 @@ class Lexer:
         'and': TokenType.AND,
         'or': TokenType.OR,
         'not': TokenType.NOT,
+        'async': TokenType.ASYNC,
+        'await': TokenType.AWAIT,
+        'yield': TokenType.YIELD,
+        'try': TokenType.TRY,
+        'except': TokenType.EXCEPT,
+        'finally': TokenType.FINALLY,
+        'with': TokenType.WITH,
+        'raise': TokenType.RAISE,
+        'self': TokenType.SELF,
+        'super': TokenType.SUPER,
+        '__init__': TokenType.INIT,
+        'staticmethod': TokenType.STATICMETHOD,
+        'classmethod': TokenType.CLASSMETHOD,
+        'property': TokenType.PROPERTY,
     }
 
     def __init__(self, source: str):
@@ -494,6 +523,9 @@ class Lexer:
                 elif ch == '?':
                     pos += 1
                     self.tokens.append(Token(TokenType.QUESTION, None, line_num, start_pos))
+                elif ch == '@':
+                    pos += 1
+                    self.tokens.append(Token(TokenType.AT, None, line_num, start_pos))
                 else:
                     self.error(f"Unexpected character '{ch}' at line {line_num}")
                     pos += 1

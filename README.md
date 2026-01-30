@@ -1,34 +1,55 @@
 # Sharp Programming Language
 
-A modern, Python-like programming language with advanced features: pattern matching, algebraic data types, optional static typing, async/await, and more.
+A modern, Python-like programming language with **advanced features**: pattern matching, algebraic data types, classes & OOP, decorators, async/await, generators, and more.
 
 ---
 
-## 🚀 What's New (2026)
-- **Full-featured GUI IDE** (Tkinter):
-  - Syntax highlighting, autocompletion (keywords, modules, functions)
-  - Run Sharp code and GUI apps instantly
-  - Output panel, line numbers, file management
-- **Autocomplete**: Context-aware, works for keywords, modules, and functions (like Python/VSCode)
-- **Complete Module System**: 40+ modules (math, string, collections, file, network, PyQt5 GUI, etc.)
-- **PyQt5 GUI Support**: Build and run GUI apps in Sharp. If PyQt5 is missing, the IDE will tell you how to install it.
-- **All bugs fixed**: Stable, production-ready, all modules usable in the IDE
+## 🚀 What's New (2026 - MAJOR UPDATE)
 
----
+### 🔥 **New Language Features**
+- **Classes & Object-Oriented Programming**: Full OOP support with inheritance, methods, constructors
+- **Decorators**: Function and class decorators with chaining
+- **Complete Exception Handling**: try/except/else/finally with exception chaining
+- **Generators**: `yield` for lazy evaluation
+- **Async/Await**: Asynchronous programming with `async`/`await`
+- **Context Managers**: `with` statements for resource management
+- **Type Annotations**: Optional type hints (syntax ready, validation coming)
+- **Raise Statements**: Custom exception throwing
 
-## Features
+### 🎨 **IDE Improvements**
+- **Multi-tab Editor**: Edit multiple files simultaneously
+- **Line Numbers**: Professional margin with synchronized scrolling
+- **File Explorer**: Browse and open project files
+- **Code Outline**: View function/variable structure
+- **Output Panel**: Console, errors, and warnings tabs
+- **Find & Replace**: Ctrl+F and Ctrl+H shortcuts
+- **Intelligent Autocompletion**: Context-aware like Python/VSCode
+- **Sharp Logo**: Professional branding (SVG gradient design)
+- **Dark Theme**: PyCharm-like styling
 
+### 📚 **Core Features**
 - **Simple Syntax**: Indentation-based, clean and readable like Python
-- **Dynamic Typing**: No explicit type declarations required (but optional static typing coming)
 - **Pattern Matching**: Powerful `match` expressions
 - **First-class Functions**: Lambdas, closures, higher-order functions
-- **Algebraic Data Types**: Enums, tuples, records
-- **Standard Library**: 140+ built-in functions and 40+ modules
-- **REPL**: Interactive shell for exploration
-- **FFI**: Call Python/native functions
-- **Full IDE**: GUI, autocompletion, syntax highlighting, run GUI apps
-- **Module System**: Import Sharp and Python modules, aliasing, selective imports
-- **GUI Support**: PyQt5 and wxPython wrappers, build desktop apps
+- **Standard Library**: 140+ built-in functions
+- **Module System**: 40+ modules (math, string, collections, file, network, PyQt5, etc.)
+- **GUI Support**: PyQt5 and wxPython wrappers
+- **REPL**: Interactive shell
+
+---
+
+## 📊 Feature Comparison
+
+| Feature | Sharp | Python | JavaScript |
+|---------|-------|--------|------------|
+| Classes | ✅ | ✅ | ✅ |
+| Decorators | ✅ | ✅ | ✅ |
+| Generators | ✅ | ✅ | ✅ |
+| Async/Await | ✅ | ✅ | ✅ |
+| Pattern Matching | ✅ | ✅ | ❌ |
+| Simple Syntax | ✅ | ✅ | ❌ |
+| Type Hints | ⚠️  | ✅ | ✅ |
+| GUI (built-in) | ✅ | ❌ | ❌ |
 
 ---
 
@@ -45,9 +66,43 @@ python repl.py  # Command-line REPL
 print("Hello, Sharp!")
 ```
 
+### Example: Classes
+```sharp
+class Person:
+    def __init__(self, name):
+        self.name = name
+    
+    def greet(self):
+        return "Hello, " + self.name
+
+alice = Person("Alice")
+print(alice.greet())  # Hello, Alice
+```
+
+### Example: Exception Handling
+```sharp
+try:
+    result = 10 / 0
+except:
+    print("Error caught!")
+finally:
+    print("Done!")
+```
+
+### Example: Generators
+```sharp
+def count_up(n):
+    for i in range(n):
+        yield i
+
+for num in count_up(5):
+    print(num)  # 0, 1, 2, 3, 4
+```
+
 ### Example: PyQt5 GUI
 ```sharp
 import pyqt5_wrapper as gui
+````
 win = gui.SharpWindow("Hello GUI")
 win.add_label("Welcome to Sharp GUI!")
 win.show()

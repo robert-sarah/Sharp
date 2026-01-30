@@ -39,15 +39,19 @@ class SharpWindow:
         
         self.widgets = {}
     
-    def add_label(self, name: str, text: str):
+    def add_label(self, text: str, name: Optional[str] = None):
         """Add a label to the window"""
+        if name is None:
+            name = f"label_{len(self.widgets)}"
         label = QLabel(text)
         self.widgets[name] = label
         self.main_layout.addWidget(label)
         return label
     
-    def add_button(self, name: str, text: str, callback: Optional[Callable] = None):
+    def add_button(self, text: str, callback: Optional[Callable] = None, name: Optional[str] = None):
         """Add a button to the window"""
+        if name is None:
+            name = f"button_{len(self.widgets)}"
         button = QPushButton(text)
         if callback:
             button.clicked.connect(callback)
@@ -55,16 +59,20 @@ class SharpWindow:
         self.main_layout.addWidget(button)
         return button
     
-    def add_textbox(self, name: str, placeholder: str = ""):
+    def add_textbox(self, placeholder: str = "", name: Optional[str] = None):
         """Add a text input field"""
+        if name is None:
+            name = f"textbox_{len(self.widgets)}"
         textbox = QLineEdit()
         textbox.setPlaceholderText(placeholder)
         self.widgets[name] = textbox
         self.main_layout.addWidget(textbox)
         return textbox
     
-    def add_textarea(self, name: str, text: str = ""):
+    def add_textarea(self, text: str = "", name: Optional[str] = None):
         """Add a multi-line text area"""
+        if name is None:
+            name = f"textarea_{len(self.widgets)}"
         textarea = QTextEdit()
         textarea.setText(text)
         self.widgets[name] = textarea

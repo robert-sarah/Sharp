@@ -193,3 +193,129 @@ class Program(ASTNode):
 @dataclass
 class PassStmt(ASTNode):
     pass
+# Classes and OOP
+@dataclass
+class ClassDef(ASTNode):
+    name: str
+    bases: List[str]  # Base class names
+    body: List[ASTNode]
+
+@dataclass
+class MethodDef(ASTNode):
+    name: str
+    params: List[str]
+    defaults: List[Optional[ASTNode]]
+    body: List[ASTNode]
+    decorators: List[str]  # List of decorator names
+
+@dataclass
+class SelfRef(ASTNode):
+    pass
+
+@dataclass
+class SuperCall(ASTNode):
+    args: List[ASTNode]
+
+# Decorators
+@dataclass
+class Decorator(ASTNode):
+    name: str
+    args: List[ASTNode]
+
+@dataclass
+class DecoratedFunction(ASTNode):
+    decorators: List[ASTNode]  # List of Decorator nodes
+    func: FunctionDef
+
+@dataclass
+class DecoratedClass(ASTNode):
+    decorators: List[ASTNode]  # List of Decorator nodes
+    cls: 'ClassDef'
+
+# Type Annotations
+@dataclass
+class TypeAnnotation(ASTNode):
+    name: str
+    annotation: str  # Type annotation as string
+
+@dataclass
+class FunctionDefWithTypes(ASTNode):
+    name: str
+    params: List[str]
+    param_types: List[Optional[str]]  # Type annotations for params
+    return_type: Optional[str]
+    defaults: List[Optional[ASTNode]]
+    body: List[ASTNode]
+
+# Exception Handling
+@dataclass
+class TryStmt(ASTNode):
+    body: List[ASTNode]
+    except_handlers: List['ExceptHandler']  # List of except clauses
+    else_body: Optional[List[ASTNode]]  # Else clause (if no exception)
+    finally_body: Optional[List[ASTNode]]  # Finally clause (always runs)
+
+@dataclass
+class ExceptHandler(ASTNode):
+    exception_type: Optional[str]  # None means catch-all
+    var_name: Optional[str]  # Variable name to bind exception
+    body: List[ASTNode]
+
+@dataclass
+class RaiseStmt(ASTNode):
+    exception: Optional[ASTNode]  # Exception to raise
+    cause: Optional[ASTNode]  # Cause (from clause)
+
+@dataclass
+class WithStmt(ASTNode):
+    context_var: Optional[str]
+    context_expr: ASTNode
+    body: List[ASTNode]
+
+# Generators
+@dataclass
+class YieldStmt(ASTNode):
+    value: Optional[ASTNode]
+
+@dataclass
+class GeneratorExpr(ASTNode):
+    expr: ASTNode
+    target: str
+    iterable: ASTNode
+    condition: Optional[ASTNode]
+
+# Async/Await
+@dataclass
+class AsyncFunctionDef(ASTNode):
+    name: str
+    params: List[str]
+    defaults: List[Optional[ASTNode]]
+    body: List[ASTNode]
+
+@dataclass
+class AwaitExpr(ASTNode):
+    value: ASTNode
+
+@dataclass
+class AsyncForLoop(ASTNode):
+    target: str
+    iterable: ASTNode
+    body: List[ASTNode]
+
+@dataclass
+class AsyncWithStmt(ASTNode):
+    context_var: Optional[str]
+    context_expr: ASTNode
+    body: List[ASTNode]
+
+# *args and **kwargs
+@dataclass
+class VarArgs(ASTNode):
+    args: List[ASTNode]  # Arguments list
+    kwargs: dict  # Keyword arguments
+
+# Unpacking
+@dataclass
+class UnpackingAssignment(ASTNode):
+    targets: List[str]  # a, b, *rest = values
+    values: ASTNode

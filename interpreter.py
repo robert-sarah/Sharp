@@ -12,6 +12,36 @@ from stdlib import (
     ReturnValue, BreakException, ContinueException, STDLIB
 )
 
+# Exception types for Sharp
+class SharpException(Exception):
+    """Base class for Sharp exceptions."""
+    pass
+
+class SharpRuntimeError(SharpException):
+    """Runtime error in Sharp."""
+    pass
+
+# Class representation in Sharp
+class SharpClass:
+    """Represents a Sharp class."""
+    def __init__(self, name: str, bases: List['SharpClass'], methods: Dict[str, Any], attributes: Dict[str, Any]):
+        self.name = name
+        self.bases = bases
+        self.methods = methods
+        self.attributes = attributes
+    
+    def __repr__(self):
+        return f"<class '{self.name}'>"
+
+class SharpInstance:
+    """Represents an instance of a Sharp class."""
+    def __init__(self, cls: SharpClass):
+        self.cls = cls
+        self.attributes = {}
+    
+    def __repr__(self):
+        return f"<{self.cls.name} instance>"
+
 class Environment:
     """Environment for variable scope."""
     
@@ -298,6 +328,39 @@ class Interpreter:
         elif isinstance(node, PassStmt):
             return SharpNil()
         
+        elif isinstance(node, ClassDef):
+            return self.eval_class_def(node)
+        
+        elif isinstance(node, DecoratedFunction):
+            return self.eval_decorated_function(node)
+        
+        elif isinstance(node, DecoratedClass):
+            return self.eval_decorated_class(node)
+        
+        elif isinstance(node, TryStmt):
+            return self.eval_try_stmt(node)
+        
+        elif isinstance(node, RaiseStmt):
+            return self.eval_raise_stmt(node)
+        
+        elif isinstance(node, WithStmt):
+            return self.eval_with_stmt(node)
+        
+        elif isinstance(node, YieldStmt):
+            return self.eval_yield_stmt(node)
+        
+        elif isinstance(node, AsyncFunctionDef):
+            return self.eval_async_function_def(node)
+        
+        elif isinstance(node, AwaitExpr):
+            return self.eval_await_expr(node)
+        
+        elif isinstance(node, AsyncForLoop):
+            return self.eval_async_for_loop(node)
+        
+        elif isinstance(node, AsyncWithStmt):
+            return self.eval_async_with_stmt(node)
+        
         elif isinstance(node, Program):
             return self.interpret(node)
         
@@ -458,6 +521,39 @@ class Interpreter:
             finally:
                 self.current_env = prev_env
         
+        elif isinstance(func, SharpClass):
+            # Create instance of class
+            instance = SharpInstance(func)
+            
+            # Call __init__ if it exists
+            if '__init__' in func.methods:
+                init_method = func.methods['__init__']
+                # Bind self to __init__
+                init_env = Environment(init_method.closure)
+                init_env.define('self', instance)
+                
+                # Bind parameters
+                for i, param in enumerate(init_method.params):
+                    if param == 'self':
+                        continue
+                    if i < len(args):
+                        init_env.define(param, args[i])
+                    elif param in kwargs:
+                        init_env.define(param, kwargs[param])
+                
+                # Execute __init__
+                prev_env = self.current_env
+                self.current_env = init_env
+                try:
+                    for stmt in init_method.body:
+                        self.evaluate(stmt)
+                except ReturnValue:
+                    pass
+                finally:
+                    self.current_env = prev_env
+            
+            return instance
+        
         elif callable(func):
             return func(*args, **kwargs)
         
@@ -603,3 +699,238 @@ class Interpreter:
             return len(value) > 0
         else:
             return True
+    def eval_class_def(self, node: ClassDef) -> SharpClass:
+        """Evaluate class definition."""
+        # Resolve base classes
+        bases = []
+        for base_name in node.bases:
+            try:
+                base_cls = self.current_env.get(base_name)
+                if not isinstance(base_cls, SharpClass):
+                    raise SharpRuntimeError(f"Base '{base_name}' is not a class")
+                bases.append(base_cls)
+            except NameError:
+                raise SharpRuntimeError(f"Base class '{base_name}' not found")
+        
+        # Create new environment for class
+        class_env = Environment(self.current_env)
+        
+        # Evaluate class body
+        methods = {}
+        attributes = {}
+        
+        prev_env = self.current_env
+        self.current_env = class_env
+        
+        for stmt in node.body:
+            if isinstance(stmt, FunctionDef):
+                # Methods
+                func = SharpFunction(stmt.name, stmt.params, stmt.defaults, stmt.body, class_env)
+                methods[stmt.name] = func
+                class_env.define(stmt.name, func)
+            elif isinstance(stmt, VarDecl):
+                # Class attributes
+                value = self.evaluate(stmt.value)
+                attributes[stmt.name] = value
+                class_env.define(stmt.name, value)
+            else:
+                self.evaluate(stmt)
+        
+        self.current_env = prev_env
+        
+        # Create and register class
+        sharp_class = SharpClass(node.name, bases, methods, attributes)
+        self.current_env.define(node.name, sharp_class)
+        
+        return sharp_class
+
+    def eval_decorated_function(self, node: DecoratedFunction):
+        """Evaluate decorated function."""
+        func = self.evaluate(node.func)
+        
+        # Apply decorators from bottom to top
+        for decorator in reversed(node.decorators):
+            try:
+                dec_func = self.current_env.get(decorator.name)
+            except NameError:
+                raise SharpRuntimeError(f"Decorator '{decorator.name}' not found")
+            
+            if callable(dec_func) or isinstance(dec_func, SharpFunction):
+                if decorator.args:
+                    args = [self.evaluate(arg) for arg in decorator.args]
+                    # Call decorator with arguments, then with function
+                    dec_with_args = self.call_function(dec_func, args)
+                    func = self.call_function(dec_with_args, [func])
+                else:
+                    func = self.call_function(dec_func, [func])
+        
+        return func
+
+    def eval_decorated_class(self, node: DecoratedClass):
+        """Evaluate decorated class."""
+        cls = self.evaluate(node.cls)
+        
+        # Apply decorators from bottom to top
+        for decorator in reversed(node.decorators):
+            try:
+                dec_func = self.current_env.get(decorator.name)
+            except NameError:
+                raise SharpRuntimeError(f"Decorator '{decorator.name}' not found")
+            
+            if callable(dec_func) or isinstance(dec_func, SharpFunction):
+                if decorator.args:
+                    args = [self.evaluate(arg) for arg in decorator.args]
+                    dec_with_args = self.call_function(dec_func, args)
+                    cls = self.call_function(dec_with_args, [cls])
+                else:
+                    cls = self.call_function(dec_func, [cls])
+        
+        return cls
+
+    def eval_try_stmt(self, node: TryStmt):
+        """Evaluate try/except/finally statement."""
+        result = SharpNil()
+        exception_caught = False
+        caught_exception = None
+        
+        try:
+            # Try to execute try block
+            for stmt in node.body:
+                result = self.evaluate(stmt)
+        
+        except (ReturnValue, BreakException, ContinueException):
+            # Don't catch control flow exceptions
+            raise
+        
+        except Exception as e:
+            # Handle exceptions
+            for handler in node.except_handlers:
+                if handler.exception_type is None:
+                    # Catch-all
+                    if handler.var_name:
+                        self.current_env.define(handler.var_name, str(e))
+                    
+                    for stmt in handler.body:
+                        result = self.evaluate(stmt)
+                    exception_caught = True
+                    caught_exception = e
+                    break
+                elif handler.exception_type in str(type(e).__name__):
+                    # Matching exception type
+                    if handler.var_name:
+                        self.current_env.define(handler.var_name, str(e))
+                    
+                    for stmt in handler.body:
+                        result = self.evaluate(stmt)
+                    exception_caught = True
+                    caught_exception = e
+                    break
+        
+        # Execute else block if no exception
+        if not exception_caught and node.else_body:
+            for stmt in node.else_body:
+                result = self.evaluate(stmt)
+        
+        # Always execute finally block
+        if node.finally_body:
+            for stmt in node.finally_body:
+                result = self.evaluate(stmt)
+        
+        return result
+
+    def eval_raise_stmt(self, node: RaiseStmt):
+        """Evaluate raise statement."""
+        if node.exception is None:
+            raise SharpRuntimeError("No exception to raise")
+        
+        exception_value = self.evaluate(node.exception)
+        raise SharpRuntimeError(str(exception_value))
+
+    def eval_with_stmt(self, node: WithStmt):
+        """Evaluate with statement (context manager)."""
+        context = self.evaluate(node.context_expr)
+        result = SharpNil()
+        
+        # Call __enter__
+        if hasattr(context, '__enter__'):
+            enter_result = context.__enter__()
+            if node.context_var:
+                self.current_env.define(node.context_var, enter_result)
+        
+        try:
+            # Execute body
+            for stmt in node.body:
+                result = self.evaluate(stmt)
+        finally:
+            # Call __exit__
+            if hasattr(context, '__exit__'):
+                context.__exit__(None, None, None)
+        
+        return result
+
+    def eval_yield_stmt(self, node: YieldStmt):
+        """Evaluate yield statement (generator)."""
+        if node.value:
+            return self.evaluate(node.value)
+        return SharpNil()
+
+    def eval_async_function_def(self, node: AsyncFunctionDef):
+        """Evaluate async function definition."""
+        # For now, treat async functions like regular functions
+        # Full async support would require asyncio integration
+        func = SharpFunction(node.name, node.params, node.defaults, node.body, self.current_env)
+        self.current_env.define(node.name, func)
+        return SharpNil()
+
+    def eval_await_expr(self, node: AwaitExpr):
+        """Evaluate await expression."""
+        # For now, just evaluate the expression
+        # Full async support would require asyncio integration
+        return self.evaluate(node.value)
+
+    def eval_async_for_loop(self, node: AsyncForLoop):
+        """Evaluate async for loop."""
+        # For now, treat like regular for loop
+        iterable = self.evaluate(node.iterable)
+        result = SharpNil()
+        
+        for item in iterable:
+            loop_env = Environment(self.current_env)
+            loop_env.define(node.target, item)
+            
+            prev_env = self.current_env
+            self.current_env = loop_env
+            
+            try:
+                for stmt in node.body:
+                    result = self.evaluate(stmt)
+            except BreakException:
+                self.current_env = prev_env
+                break
+            except ContinueException:
+                self.current_env = prev_env
+                continue
+            finally:
+                self.current_env = prev_env
+        
+        return result
+
+    def eval_async_with_stmt(self, node: AsyncWithStmt):
+        """Evaluate async with statement."""
+        # For now, treat like regular with statement
+        context = self.evaluate(node.context_expr)
+        result = SharpNil()
+        
+        if hasattr(context, '__aenter__'):
+            enter_result = context.__aenter__()
+            if node.context_var:
+                self.current_env.define(node.context_var, enter_result)
+        
+        try:
+            for stmt in node.body:
+                result = self.evaluate(stmt)
+        finally:
+            if hasattr(context, '__aexit__'):
+                context.__aexit__(None, None, None)
+        
+        return result

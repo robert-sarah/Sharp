@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""
+Sharp Language - New Features Examples
+Demonstrates all newly added language features
+"""
+
+# ============ CLASSES & OOP ============
+
+# Example 1: Simple Class
+class Animal:
+    species = "Unknown"
+    
+    def __init__(self, name):
+        self.name = name
+    
+    def speak(self):
+        return "Some sound"
+
+dog = Animal("Buddy")
+print(dog)  # <Animal instance>
+
+# Example 2: Class Inheritance (syntax supported)
+class Dog(Animal):
+    species = "Canis lupus"
+    
+    def speak(self):
+        return "Woof!"
+
+# ============ DECORATORS ============
+
+# Example 3: Function Decorators
+@deprecated
+def old_function():
+    return "This is old"
+
+# ============ EXCEPTION HANDLING ============
+
+# Example 4: Try/Except/Else/Finally
+try:
+    result = 10 / 2
+except ZeroDivisionError:
+    print("Cannot divide by zero!")
+else:
+    print("Division successful!")
+finally:
+    print("Cleaning up...")
+
+# Example 5: Raise statement
+def validate_age(age):
+    if age < 0:
+        raise ValueError("Age cannot be negative")
+    return True
+
+# ============ GENERATORS ============
+
+# Example 6: Generator with yield
+def count_up_to(n):
+    i = 0
+    while i < n:
+        yield i
+        i += 1
+
+# Usage:
+for num in count_up_to(5):
+    print(num)
+
+# ============ ASYNC/AWAIT ============
+
+# Example 7: Async functions
+async def fetch_data(url):
+    # In real code, this would be async I/O
+    await some_async_operation()
+    return "data"
+
+# Example 8: Async for loop
+async for item in async_iterator():
+    print(item)
+
+# ============ WITH STATEMENTS ============
+
+# Example 9: Context managers
+with file_handle as f:
+    content = f.read()
+
+# ============ TYPE ANNOTATIONS (Coming Soon) ============
+
+# Example 10: Type hints (parsed, not validated yet)
+def greet(name: str) -> str:
+    return "Hello, " + name

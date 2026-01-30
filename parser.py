@@ -41,7 +41,21 @@ class Parser:
     def expect(self, token_type: TokenType) -> Token:
         """Consume a token of expected type."""
         if not self.current_token or self.current_token.type != token_type:
-            self.error(f"Expected {token_type.name}, got {self.current_token.type.name if self.current_token else 'EOF'}")
+            expected_name = token_type.name
+            got_name = self.current_token.type.name if self.current_token else 'EOF'
+            
+            # Provide helpful context for common syntax errors
+            error_msg = f"Expected {expected_name}, got {got_name}"
+            
+            if token_type == TokenType.LPAREN and expected_name == "LPAREN":
+                if got_name == "NEWLINE":
+                    error_msg += " (Missing parentheses in function definition? Use: def name():)"
+                elif got_name == "IDENTIFIER":
+                    error_msg += " (Missing operator or parentheses?)"
+            elif token_type == TokenType.COLON and got_name == "NEWLINE":
+                error_msg += " (Missing colon? Use: def name():"
+            
+            self.error(error_msg)
         token = self.current_token
         self.advance()
         return token
@@ -79,6 +93,10 @@ class Parser:
         
         if self.current_token.type == TokenType.DEF:
             return self.parse_function()
+        elif self.current_token.type == TokenType.CLASS:
+            return self.parse_class()
+        elif self.current_token.type == TokenType.ASYNC:
+            return self.parse_async()
         elif self.current_token.type == TokenType.LET:
             return self.parse_variable()
         elif self.current_token.type == TokenType.IF:
@@ -103,6 +121,19 @@ class Parser:
             return self.parse_import()
         elif self.current_token.type == TokenType.FROM:
             return self.parse_from_import()
+        elif self.current_token.type == TokenType.TRY:
+            return self.parse_try()
+        elif self.current_token.type == TokenType.RAISE:
+            return self.parse_raise()
+        elif self.current_token.type == TokenType.WITH:
+            return self.parse_with()
+        elif self.current_token.type == TokenType.YIELD:
+            return self.parse_yield()
+        elif self.current_token.type == TokenType.PASS:
+            self.advance()
+            return PassStmt()
+        elif self.current_token.type == TokenType.AT:
+            return self.parse_decorator()
         else:
             return self.parse_expression_statement()
 
@@ -781,3 +812,219 @@ class Parser:
         body = self.parse_expression()
         
         return Lambda(params, body)
+    def parse_class(self) -> ClassDef:
+        """Parse class definition."""
+        self.expect(TokenType.CLASS)
+        name_token = self.expect(TokenType.IDENTIFIER)
+        
+        bases = []
+        if self.current_token and self.current_token.type == TokenType.LPAREN:
+            self.advance()
+            while self.current_token and self.current_token.type != TokenType.RPAREN:
+                base_token = self.expect(TokenType.IDENTIFIER)
+                bases.append(base_token.value)
+                if self.current_token and self.current_token.type == TokenType.COMMA:
+                    self.advance()
+            self.expect(TokenType.RPAREN)
+        
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+        body = self.parse_block()
+        
+        return ClassDef(name_token.value, bases, body)
+
+    def parse_async(self) -> ASTNode:
+        """Parse async function or for loop."""
+        self.expect(TokenType.ASYNC)
+        
+        if self.current_token and self.current_token.type == TokenType.DEF:
+            self.advance()
+            name_token = self.expect(TokenType.IDENTIFIER)
+            self.expect(TokenType.LPAREN)
+            
+            params = []
+            defaults = []
+            
+            while self.current_token and self.current_token.type != TokenType.RPAREN:
+                param_token = self.expect(TokenType.IDENTIFIER)
+                params.append(param_token.value)
+                
+                if self.current_token and self.current_token.type == TokenType.ASSIGN:
+                    self.advance()
+                    defaults.append(self.parse_expression())
+                else:
+                    defaults.append(None)
+                
+                if self.current_token and self.current_token.type == TokenType.COMMA:
+                    self.advance()
+            
+            self.expect(TokenType.RPAREN)
+            self.expect(TokenType.COLON)
+            self.skip_newlines()
+            
+            body = self.parse_block()
+            
+            return AsyncFunctionDef(name_token.value, params, defaults, body)
+        
+        elif self.current_token and self.current_token.type == TokenType.FOR:
+            return self.parse_async_for()
+        
+        elif self.current_token and self.current_token.type == TokenType.WITH:
+            return self.parse_async_with()
+        
+        else:
+            self.error("Expected 'def', 'for', or 'with' after 'async'")
+
+    def parse_async_for(self) -> AsyncForLoop:
+        """Parse async for loop."""
+        self.expect(TokenType.FOR)
+        target_token = self.expect(TokenType.IDENTIFIER)
+        self.expect(TokenType.IN)
+        iterable = self.parse_expression()
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+        
+        body = self.parse_block()
+        
+        return AsyncForLoop(target_token.value, iterable, body)
+
+    def parse_async_with(self) -> AsyncWithStmt:
+        """Parse async with statement."""
+        self.expect(TokenType.WITH)
+        context_expr = self.parse_expression()
+        
+        context_var = None
+        if self.current_token and self.current_token.type == TokenType.AS:
+            self.advance()
+            var_token = self.expect(TokenType.IDENTIFIER)
+            context_var = var_token.value
+        
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+        body = self.parse_block()
+        
+        return AsyncWithStmt(context_var, context_expr, body)
+
+    def parse_try(self) -> TryStmt:
+        """Parse try/except/finally statement."""
+        self.expect(TokenType.TRY)
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+        
+        body = self.parse_block()
+        except_handlers = []
+        else_body = None
+        finally_body = None
+        
+        # Parse except clauses
+        while self.current_token and self.current_token.type == TokenType.EXCEPT:
+            self.advance()
+            
+            exception_type = None
+            var_name = None
+            
+            if self.current_token and self.current_token.type == TokenType.IDENTIFIER:
+                type_token = self.expect(TokenType.IDENTIFIER)
+                exception_type = type_token.value
+                
+                if self.current_token and self.current_token.type == TokenType.AS:
+                    self.advance()
+                    var_token = self.expect(TokenType.IDENTIFIER)
+                    var_name = var_token.value
+            
+            self.expect(TokenType.COLON)
+            self.skip_newlines()
+            handler_body = self.parse_block()
+            
+            except_handlers.append(ExceptHandler(exception_type, var_name, handler_body))
+        
+        # Parse else clause (if present)
+        if self.current_token and self.current_token.type == TokenType.ELSE:
+            self.advance()
+            self.expect(TokenType.COLON)
+            self.skip_newlines()
+            else_body = self.parse_block()
+        
+        # Parse finally clause (if present)
+        if self.current_token and self.current_token.type == TokenType.FINALLY:
+            self.advance()
+            self.expect(TokenType.COLON)
+            self.skip_newlines()
+            finally_body = self.parse_block()
+        
+        return TryStmt(body, except_handlers, else_body, finally_body)
+
+    def parse_raise(self) -> RaiseStmt:
+        """Parse raise statement."""
+        self.expect(TokenType.RAISE)
+        
+        exception = None
+        cause = None
+        
+        if self.current_token and self.current_token.type not in (TokenType.NEWLINE, TokenType.EOF):
+            exception = self.parse_expression()
+            
+            # Check for 'from' clause
+            if self.current_token and self.current_token.type == TokenType.FROM:
+                self.advance()
+                cause = self.parse_expression()
+        
+        return RaiseStmt(exception, cause)
+
+    def parse_with(self) -> WithStmt:
+        """Parse with statement (context manager)."""
+        self.expect(TokenType.WITH)
+        context_expr = self.parse_expression()
+        
+        context_var = None
+        if self.current_token and self.current_token.type == TokenType.AS:
+            self.advance()
+            var_token = self.expect(TokenType.IDENTIFIER)
+            context_var = var_token.value
+        
+        self.expect(TokenType.COLON)
+        self.skip_newlines()
+        body = self.parse_block()
+        
+        return WithStmt(context_var, context_expr, body)
+
+    def parse_yield(self) -> YieldStmt:
+        """Parse yield statement (generator)."""
+        self.expect(TokenType.YIELD)
+        
+        value = None
+        if self.current_token and self.current_token.type not in (TokenType.NEWLINE, TokenType.EOF):
+            value = self.parse_expression()
+        
+        return YieldStmt(value)
+
+    def parse_decorator(self) -> ASTNode:
+        """Parse decorator and the decorated function/class."""
+        decorators = []
+        
+        # Parse all decorators
+        while self.current_token and self.current_token.type == TokenType.AT:
+            self.advance()
+            name_token = self.expect(TokenType.IDENTIFIER)
+            
+            args = []
+            if self.current_token and self.current_token.type == TokenType.LPAREN:
+                self.advance()
+                while self.current_token and self.current_token.type != TokenType.RPAREN:
+                    args.append(self.parse_expression())
+                    if self.current_token and self.current_token.type == TokenType.COMMA:
+                        self.advance()
+                self.expect(TokenType.RPAREN)
+            
+            decorators.append(Decorator(name_token.value, args))
+            self.skip_newlines()
+        
+        # Parse decorated function or class
+        if self.current_token and self.current_token.type == TokenType.DEF:
+            func = self.parse_function()
+            return DecoratedFunction(decorators, func)
+        elif self.current_token and self.current_token.type == TokenType.CLASS:
+            cls = self.parse_class()
+            return DecoratedClass(decorators, cls)
+        else:
+            self.error("Decorator must precede a function or class definition")
