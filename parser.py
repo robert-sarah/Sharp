@@ -1002,6 +1002,36 @@ class Parser:
         
         return YieldStmt(value)
 
+    def parse_global(self) -> GlobalStmt:
+        """Parse global statement."""
+        self.expect(TokenType.GLOBAL)
+        names = []
+        
+        name_token = self.expect(TokenType.IDENTIFIER)
+        names.append(name_token.value)
+        
+        while self.current_token and self.current_token.type == TokenType.COMMA:
+            self.advance()
+            name_token = self.expect(TokenType.IDENTIFIER)
+            names.append(name_token.value)
+        
+        return GlobalStmt(names)
+
+    def parse_nonlocal(self) -> NonlocalStmt:
+        """Parse nonlocal statement."""
+        self.expect(TokenType.NONLOCAL)
+        names = []
+        
+        name_token = self.expect(TokenType.IDENTIFIER)
+        names.append(name_token.value)
+        
+        while self.current_token and self.current_token.type == TokenType.COMMA:
+            self.advance()
+            name_token = self.expect(TokenType.IDENTIFIER)
+            names.append(name_token.value)
+        
+        return NonlocalStmt(names)
+
     def parse_decorator(self) -> ASTNode:
         """Parse decorator and the decorated function/class."""
         decorators = []

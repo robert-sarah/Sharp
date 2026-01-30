@@ -319,3 +319,14 @@ class VarArgs(ASTNode):
 class UnpackingAssignment(ASTNode):
     targets: List[str]  # a, b, *rest = values
     values: ASTNode
+
+# Scope modifiers
+@dataclass
+class GlobalStmt(ASTNode):
+    """Global statement: global x, y, z"""
+    names: List[str]
+
+@dataclass
+class NonlocalStmt(ASTNode):
+    """Nonlocal statement: nonlocal x, y"""
+    names: List[str]
