@@ -132,6 +132,10 @@ class Parser:
         elif self.current_token.type == TokenType.PASS:
             self.advance()
             return PassStmt()
+        elif self.current_token.type == TokenType.GLOBAL:
+            return self.parse_global()
+        elif self.current_token.type == TokenType.NONLOCAL:
+            return self.parse_nonlocal()
         elif self.current_token.type == TokenType.AT:
             return self.parse_decorator()
         else:

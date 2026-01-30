@@ -39,6 +39,8 @@ class TokenType(Enum):
     AS = auto()
     CLASS = auto()
     PASS = auto()
+    GLOBAL = auto()
+    NONLOCAL = auto()
     ASYNC = auto()
     AWAIT = auto()
     YIELD = auto()
@@ -148,6 +150,8 @@ class Lexer:
         'false': TokenType.FALSE,
         'nil': TokenType.NIL,
         'pass': TokenType.PASS,
+        'global': TokenType.GLOBAL,
+        'nonlocal': TokenType.NONLOCAL,
         'and': TokenType.AND,
         'or': TokenType.OR,
         'not': TokenType.NOT,
