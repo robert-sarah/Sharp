@@ -361,6 +361,12 @@ class Interpreter:
         elif isinstance(node, AsyncWithStmt):
             return self.eval_async_with_stmt(node)
         
+        elif isinstance(node, GlobalStmt):
+            return self.eval_global_stmt(node)
+        
+        elif isinstance(node, NonlocalStmt):
+            return self.eval_nonlocal_stmt(node)
+        
         elif isinstance(node, Program):
             return self.interpret(node)
         
